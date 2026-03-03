@@ -1,0 +1,2014 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brumadinho Digital — Status das Torres</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
+
+  <style>
+    :root{
+      --valeGreen:#006341;
+      --valeGreen2:#0B7A4A;
+      --valeGreenSoft:#E9F5EF;
+      --text:#0f172a;
+      --muted:#475569;
+      --line:#e2e8f0;
+      --bg:#0078D4;
+      --card:#fff;
+      --shadow: 0 12px 30px rgba(2,6,23,.08);
+      --shadow2: 0 8px 18px rgba(2,6,23,.06);
+      --chipGreenBg:#e8fff3; --chipGreenTx:#0b6b3a;
+      --chipBlueBg:#e8f2ff; --chipBlueTx:#1d4ed8;
+      --chipPurpleBg:#f3e8ff;--chipPurpleTx:#6d28d9;
+      --chipAmberBg:#fff7ed; --chipAmberTx:#b45309;
+      --radius:16px;
+      --radius2:18px;
+      --focus: 0 0 0 3px rgba(34,197,94,.25);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans",sans-serif;
+    }
+    a{ color:inherit; text-decoration:none; }
+    button, input, select, textarea{ font:inherit; }
+    :focus-visible{ outline:none; box-shadow: var(--focus); border-radius:12px; }
+
+    .wrap{ max-width:1280px; margin:0 auto; padding:18px 18px 40px; }
+
+    /* ========= HEADER / NAV MODERNO ========= */
+    .header{
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+      margin-bottom: 14px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px 16px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow2);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 280px;
+    }
+    .brand .title-block h1{
+      margin:0;
+      font-size:25px;
+      letter-spacing:.6px;
+      color:#0078D4;
+      font-weight:1000;
+      text-transform:uppercase;
+      line-height:1.05;
+    }
+    .brand .title-block .sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.25;
+      max-width:560px;
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+      min-width:auto;
+    }
+    .vale-logo{
+      height:54px;
+      width:auto;
+      object-fit:contain;
+      display:block;
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex:1;
+      justify-content:center;
+    }
+
+    .nav a{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid transparent;
+      color: var(--muted);
+      font-weight:900;
+      font-size:12px;
+      letter-spacing:.2px;
+      transition: all .15s ease;
+      background: transparent;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .nav a:hover{
+      border-color: var(--line);
+      background:#fff;
+      box-shadow: 0 10px 20px rgba(2,6,23,.06);
+      transform: translateY(-1px);
+      color: var(--text);
+    }
+    .nav a.active{
+      background: linear-gradient(180deg, var(--valeGreenSoft), #fff);
+      border-color:#cde9db;
+      color: var(--valeGreen);
+    }
+
+    .nav .pill-dot{
+      width:9px; height:9px; border-radius:50%;
+      background: #cbd5e1;
+    }
+    .nav a.active .pill-dot{ background:#22c55e; }
+
+    .nav-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      justify-content:flex-end;
+      min-width:210px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      color: var(--text);
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:12px;
+      box-shadow: 0 6px 16px rgba(2,6,23,.05);
+      transition: all .15s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 22px rgba(2,6,23,.08); }
+    .btn.primary{
+      background: var(--valeGreen);
+      color:#fff;
+      border-color: rgba(0,0,0,.05);
+      box-shadow: 0 10px 22px rgba(0,99,65,.22);
+    }
+    .btn.primary:hover{ filter: brightness(.97); }
+
+    .hamburger{
+      display:none;
+      border-radius:12px;
+      padding:10px 12px;
+    }
+    .hamburger .bars{
+      width:20px; height:14px;
+      display:flex; flex-direction:column; justify-content:space-between;
+    }
+    .hamburger .bars span{
+      height:2px; border-radius:2px; background:#0f172a; opacity:.75;
+    }
+
+    @media (max-width: 1040px){
+      .nav{ display:none; }
+      .hamburger{ display:inline-flex; }
+    }
+
+    .mobile-nav{
+      display:none;
+      margin-top:10px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      padding:10px;
+    }
+    .mobile-nav.open{ display:block; }
+    .mobile-nav a{
+      display:flex;
+      padding:12px 12px;
+      border-radius:14px;
+      font-weight:900;
+      color: var(--muted);
+      border:1px solid transparent;
+      gap:10px;
+      align-items:center;
+    }
+    .mobile-nav a:hover{ border-color:var(--line); background:#fafafa; color: var(--text); }
+    .mobile-nav a.active{
+      background: linear-gradient(180deg, var(--valeGreenSoft), #fff);
+      border-color:#cde9db;
+      color: var(--valeGreen);
+    }
+
+    /* ========= SEÇÕES / CONTAINERS ========= */
+    .section{
+      margin-top:14px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow2);
+      overflow:hidden;
+    }
+    .section-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg,#fff 0%,#fafafa 100%);
+    }
+    .section-header h2{
+      margin:0;
+      font-size:13px;
+      letter-spacing:.6px;
+      color:#006666;
+      font-weight:1000;
+      text-transform:uppercase;
+    }
+    .section-header .hint{ font-size:12px; color:var(--muted); font-weight:700; }
+
+    .page{ display:none; }
+    .page.active{ display:block; }
+
+    .page-hero{
+      margin-top:14px;
+      background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(255,255,255,.88));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .page-hero .title{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .page-hero .title strong{
+      color:#006666;
+      letter-spacing:.4px;
+      font-weight:1000;
+      text-transform:uppercase;
+      font-size:13px;
+    }
+    .page-hero .title span{
+      color: var(--muted);
+      font-size:12px;
+      font-weight:700;
+      line-height:1.25;
+      max-width: 840px;
+    }
+
+    /* ========= KPIs / DASHBOARD ========= */
+    .statusbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:12px 16px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg,#fff 0%, #fafafa 100%);
+    }
+    .statusbar .left-title{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:1000;
+      text-transform:uppercase;
+      letter-spacing:.6px;
+    }
+    .kpi-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end; }
+    .kpi{
+      display:flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      border:1px solid var(--line); background:#fff;
+      box-shadow:0 4px 10px rgba(2,6,23,.04);
+      font-size:12px; color:var(--muted); white-space:nowrap;
+      font-weight:800;
+    }
+    .kpi strong{ color:var(--text); font-weight:1000; min-width:24px; text-align:right; display:inline-block; }
+    .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; }
+    .dot.green{ background:#22c55e; }
+    .dot.blue{ background:#3b82f6; }
+    .dot.purple{ background:#8b5cf6; }
+    .dot.amber{ background:#f59e0b; }
+
+    .cards{ padding:14px 16px 16px; }
+    .grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:12px; }
+
+    .stat-card{
+      grid-column:span 12;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: var(--radius2);
+      padding:14px;
+      box-shadow:0 10px 24px rgba(2,6,23,.06);
+      position:relative;
+      overflow:hidden;
+    }
+    .stat-card::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(900px 240px at -10% -20%, rgba(0,99,65,.12), transparent 60%),
+        radial-gradient(700px 240px at 110% 0%, rgba(11,122,74,.10), transparent 55%);
+      pointer-events:none;
+    }
+    .stat-card .inner{ position:relative; display:flex; justify-content:space-between; gap:12px; align-items:flex-end; }
+    .stat-card .label{ color:var(--muted); font-size:12px; font-weight:900; letter-spacing:.2px; }
+    .stat-card .value{ font-size:26px; font-weight:1000; color:var(--text); line-height:1; margin-top:6px; }
+    .stat-card .icon{
+      width:40px; height:40px; border-radius:14px;
+      display:grid; place-items:center;
+      background:var(--valeGreenSoft); border:1px solid #cde9db; color:var(--valeGreen);
+      flex:0 0 auto;
+    }
+
+    /* ======= AJUSTE SOLICITADO: DASHBOARDS EM UMA LINHA (com scroll) ======= */
+    /* Mobilização dashboard em uma linha */
+    #mobilizacao-grid{
+      display:flex !important;
+      flex-wrap:nowrap !important;
+      gap:12px;
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 6px;
+      scroll-snap-type: x mandatory;
+    }
+    #mobilizacao-grid .stat-card{
+      flex: 0 0 auto;
+      min-width: 220px;
+      scroll-snap-align: start;
+    }
+
+    /* Torres dashboard em uma linha */
+    #torres-dashboard{
+      display:flex !important;
+      flex-wrap:nowrap !important;
+      gap:12px;
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 6px;
+      scroll-snap-type: x mandatory;
+    }
+    #torres-dashboard .stat-card{
+      flex: 0 0 auto;
+      min-width: 220px;
+      scroll-snap-align: start;
+    }
+
+    /* ========= MAPA ========= */
+    #map{ height:82vh; width:100%; }
+    .leaflet-container{ background:#f8fafc; }
+    .leaflet-control-zoom a{
+      background:#fff; color:#0f172a;
+      border:1px solid var(--line);
+      box-shadow:0 6px 14px rgba(2,6,23,.08);
+    }
+    .leaflet-popup-content-wrapper{
+      background:#fff; color:#0f172a;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      border-radius:14px;
+    }
+    .leaflet-popup-tip{ background:#fff; border:1px solid var(--line); }
+
+    /* ========= ÍCONE TORRE ========= */
+    .leaflet-div-icon{ background:transparent; border:none; }
+    @keyframes blink{0%,50%{opacity:1;}75%{opacity:.4;}100%{opacity:1;}}
+    .blink{ animation:blink 1.5s infinite; }
+    .tower-icon-wrap{
+      position:relative;
+      width:42px;
+      height:54px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+    }
+    .tower-icon-img{
+      width:42px;
+      height:54px;
+      object-fit:contain;
+      filter: drop-shadow(0 10px 14px rgba(2,6,23,.18));
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+    .status-dot{
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:2px;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      box-shadow:0 0 0 2px #fff, 0 8px 16px rgba(2,6,23,.18);
+      border:1px solid rgba(15,23,42,.18);
+    }
+    .status-green{ background:#22c55e; }
+    .status-blue{ background:#3b82f6; }
+    .status-purple{ background:#8b5cf6; }
+    .status-amber{ background:#f59e0b; }
+
+    /* ondas ativas */
+    .signal{
+      position:absolute;
+      left:50%;
+      bottom:22px;
+      transform:translateX(-50%);
+      pointer-events:none;
+      filter: drop-shadow(0 2px 6px rgba(34,197,94,.20));
+    }
+    .signal .wave{
+      position:absolute;
+      left:50%; top:0;
+      width:66px; height:66px;
+      transform: translate(-50%, -50%) scale(.55);
+      border-radius:999px;
+      border:2px solid rgba(34,197,94,.55);
+      opacity: var(--signal-opacity, .35);
+      animation: wave 2.8s ease-out infinite;
+      box-shadow: 0 0 0 2px rgba(34,197,94,.15) inset;
+    }
+    .signal .wave:nth-child(2){ animation-delay: .6s; }
+    .signal .wave:nth-child(3){ animation-delay: 1.2s; }
+    @keyframes wave{
+      0% { transform: translate(-50%,-50%) scale(.55); opacity: var(--signal-opacity, .35); }
+      60% { opacity: .08; }
+      100% { transform: translate(-50%,-50%) scale(1.7); opacity: 0; }
+    }
+
+    /* pendência destaque */
+    .warning-pulse{
+      position:absolute;
+      left:50%;
+      bottom:26px;
+      transform:translateX(-50%);
+      width:36px; height:36px;
+      border-radius:999px;
+      background: radial-gradient(circle,
+        rgba(253,224,71,.85) 0%,
+        rgba(253,224,71,.22) 56%,
+        rgba(253,224,71,0) 70%
+      );
+      filter: blur(.3px);
+      animation: pulseY 1.15s ease-in-out infinite;
+    }
+    @keyframes pulseY{
+      0%,100%{ transform:translateX(-50%) scale(.92); opacity:.85; }
+      50% { transform:translateX(-50%) scale(1.06); opacity:1; }
+    }
+    .tower-icon-img.warn{
+      filter:
+        drop-shadow(0 0 10px rgba(245,158,11,.50))
+        drop-shadow(0 0 20px rgba(245,158,11,.25));
+    }
+
+    /* ========= CHIPS ========= */
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px; border-radius:999px;
+      font-size:12px; font-weight:900; border:1px solid transparent; line-height:1;
+      white-space:nowrap;
+    }
+    .b-green{ background:var(--chipGreenBg); color:var(--chipGreenTx); border-color:#bbf7d0; }
+    .b-blue{ background:var(--chipBlueBg); color:var(--chipBlueTx); border-color:#bfdbfe; }
+    .b-purple{ background:var(--chipPurpleBg); color:var(--chipPurpleTx); border-color:#e9d5ff; }
+    .b-amber{ background:var(--chipAmberBg); color:var(--chipAmberTx); border-color:#fed7aa; }
+    .b-gray{ background:#f1f5f9; color:#334155; border-color:#e2e8f0; }
+
+    /* ========= FILTROS (compact) ========= */
+    .filters{
+      padding:12px 16px;
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:center;
+      border-top:1px solid var(--line);
+      background:#fff;
+    }
+    .filters .group{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .filters label{
+      font-size:12px; color:var(--muted);
+      padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+      background:#fff; display:inline-flex; gap:8px; align-items:center;
+      cursor:pointer; user-select:none;
+      font-weight:800;
+    }
+    .filters input{ accent-color:var(--valeGreen); }
+    .filters strong{
+      color:var(--valeGreen); font-weight:1000; font-size:12px;
+      text-transform:uppercase; letter-spacing:.6px;
+    }
+    .btn-reset{
+      background:var(--valeGreen); color:#fff; border:1px solid rgba(0,0,0,0.05);
+      border-radius:999px; padding:8px 12px; cursor:pointer;
+      font-size:12px; font-weight:1000; box-shadow:0 8px 18px rgba(0,99,65,.20);
+    }
+    .btn-reset:hover{ filter:brightness(.95); }
+
+    /* ========= TORRES LIST ========= */
+    .tower-card{
+      grid-column:span 12;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: var(--radius2);
+      padding:14px;
+      box-shadow:0 10px 24px rgba(2,6,23,.06);
+      cursor:pointer;
+      transition:transform .12s ease, box-shadow .12s ease;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .tower-card:hover{ transform:translateY(-1px); box-shadow:0 14px 28px rgba(2,6,23,.10); }
+    .tower-left{ display:flex; flex-direction:column; gap:6px; }
+    .tower-id{ font-weight:1000; color:#006666; letter-spacing:.2px; }
+    .tower-name{ color:var(--muted); font-size:12px; line-height:1.25; max-width:680px; font-weight:700; }
+    .tower-right{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+    .tower-meta{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+
+    @media (min-width:860px){ .tower-card{ grid-column:span 6; } }
+    @media (min-width:1140px){ .tower-card{ grid-column:span 4; } }
+
+    /* ========= MODAL ========= */
+    .modal{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(2,6,23,.55); z-index:9999; padding:18px;
+    }
+    .modal.open{ display:flex; }
+    .modal-card{
+      width:min(760px,96vw); background:#fff; border:1px solid var(--line);
+      border-radius: var(--radius2); box-shadow:var(--shadow); overflow:hidden;
+    }
+    .modal-header{
+      padding:14px 16px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg,#fff 0%,#fafafa 100%);
+    }
+    .modal-title{ font-weight:1000; color:#006666; letter-spacing:.2px; }
+    .modal-sub{ margin-top:6px; font-size:12px; color:var(--muted); font-weight:800; }
+    .modal-close{
+      cursor:pointer; background:#fff; color:var(--valeGreen);
+      border:1px solid var(--line); border-radius:999px; padding:8px 12px; font-weight:1000;
+    }
+    .modal-body{ padding:14px 16px 16px; display:grid; gap:10px; }
+    .kv .row{
+      padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:#fff;
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;
+    }
+    .kv .k{ color:var(--muted); font-size:12px; font-weight:900; }
+    .kv .v{ color:var(--text); font-size:12px; font-weight:1000; }
+    .mini{
+      font-size:12px; color:var(--muted); font-weight:800;
+      padding:10px 12px; border:1px dashed var(--line);
+      border-radius:14px; background:#fafafa;
+    }
+
+    /* ========= TIMELINE (CRONOGRAMA) ========= */
+ .timeline{ padding: 12px 16px 18px; }
+
+ /* Progresso moderno */
+ .progress-panel{
+  border:1px solid var(--line);
+  border-radius: var(--radius2);
+  background: linear-gradient(135deg, rgba(0,99,65,.08), rgba(59,130,246,.06), rgba(139,92,246,.06));
+  box-shadow:0 10px 24px rgba(2,6,23,.06);
+  padding:14px;
+  display:grid;
+  gap:12px;
+  overflow:hidden;
+  position:relative;
+ }
+ .progress-panel::before{
+  content:"";
+  position:absolute; inset:0;
+  background:
+   radial-gradient(900px 240px at -10% -20%, rgba(0,99,65,.14), transparent 60%),
+   radial-gradient(700px 240px at 110% 0%, rgba(59,130,246,.12), transparent 55%),
+   radial-gradient(700px 240px at 70% 120%, rgba(139,92,246,.10), transparent 55%);
+  pointer-events:none;
+ }
+ .progress-head{ position:relative; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-start; }
+ .ph-left{ display:flex; flex-direction:column; gap:4px; }
+ .ph-title{ font-weight:1000; color:#006666; letter-spacing:.3px; text-transform:uppercase; font-size:12px; }
+ .ph-sub{ font-size:12px; color:var(--muted); font-weight:800; }
+ .ph-right{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+
+ .progress-bar{
+  position:relative;
+  height:14px;
+  border-radius: 999px;
+  border:1px solid rgba(226,232,240,.95);
+  background:#fff;
+  overflow:hidden;
+  display:flex;
+ }
+ .progress-bar .seg{ height:100%; }
+ .progress-bar .seg-ativa{ width: var(--pct-ativa, 0%); background: linear-gradient(90deg, #22c55e, #16a34a); }
+ .progress-bar .seg-obras{ width: var(--pct-obras, 0%); background: linear-gradient(90deg, #60a5fa, #2563eb); }
+ .progress-bar .seg-pendente{ width: var(--pct-pendente, 0%); background: linear-gradient(90deg, #c4b5fd, #7c3aed); }
+ .progress-glow{
+  position:absolute; inset:-30px;
+  background: radial-gradient(circle, rgba(255,255,255,.35), rgba(255,255,255,0) 60%);
+  animation: glowMove 3.6s ease-in-out infinite;
+  pointer-events:none;
+ }
+ @keyframes glowMove{ 0%,100%{ transform: translateX(-12%); opacity:.55; } 50%{ transform: translateX(12%); opacity:.75; } }
+
+ .progress-scale{ display:flex; justify-content:space-between; font-size:11px; color:var(--muted); font-weight:900; position:relative; }
+ .progress-scale span{ position:relative; padding-top:2px; }
+ .progress-scale span::before{
+  content:"";
+  position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+  width:1px; height:8px; background: rgba(71,85,105,.25);
+ }
+ .progress-note{ position:relative; font-size:12px; color:var(--text); font-weight:1000; }
+
+ /* Status "bolinhas" piscando na tabela */
+ .status-led{
+  width:10px; height:10px; border-radius:50%;
+  display:inline-block;
+  box-shadow:0 0 0 2px #fff, 0 8px 16px rgba(2,6,23,.10);
+  border:1px solid rgba(15,23,42,.16);
+  margin-right:10px;
+  vertical-align:middle;
+ }
+ .led-green{ background:#22c55e; }
+ .led-blue{ background:#3b82f6; }
+ .led-purple{ background:#8b5cf6; }
+ .blink-fast{ animation: blink .95s infinite; }
+ .status-cell{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+ .id-cell{ display:flex; align-items:center; gap:8px; font-weight:1000; color:#006666; }
+
+/* ========= TABELA (MOBILIZAÇÃO) ========= */
+    .table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      background:#fff;
+      box-shadow:0 10px 24px rgba(2,6,23,.06);
+    }
+    .table th, .table td{
+      padding:12px 12px;
+      font-size:12px;
+      border-bottom:1px solid var(--line);
+      vertical-align:top;
+    }
+    .table th{
+      text-transform:uppercase;
+      letter-spacing:.6px;
+      font-weight:1000;
+      color:#006666;
+      background:linear-gradient(180deg,#fff 0%,#fafafa 100%);
+    }
+    .table tr:last-child td{ border-bottom:none; }
+    .table td{ color:var(--text); font-weight:800; }
+    .table .muted{ color:var(--muted); font-weight:800; }
+    .table-wrap{ padding: 14px 16px 16px; }
+
+    /* ========= OBSERVAÇÕES ========= */
+    .obs-wrap{ padding:14px 16px 16px; display:grid; gap:12px; }
+    .obs-form{
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      background:#fff;
+      box-shadow:0 10px 24px rgba(2,6,23,.06);
+      padding:14px;
+      display:grid;
+      gap:12px;
+    }
+    .form-grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:10px;
+    }
+    .field{ grid-column: span 12; display:grid; gap:6px; }
+    .field label{ font-size:12px; font-weight:1000; color:#006666; text-transform:uppercase; letter-spacing:.6px; }
+    .field input, .field select, .field textarea{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      background:#fff;
+      font-size:12px;
+      font-weight:800;
+      color: var(--text);
+      box-shadow:0 6px 14px rgba(2,6,23,.04);
+    }
+    .field textarea{ min-height: 92px; resize: vertical; }
+
+    @media (min-width: 860px){
+      .field.span-4{ grid-column: span 4; }
+      .field.span-6{ grid-column: span 6; }
+      .field.span-8{ grid-column: span 8; }
+    }
+
+    .obs-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    .obs-cards{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:12px;
+    }
+    .obs-card{
+      grid-column: span 12;
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      background:#fff;
+      box-shadow:0 10px 24px rgba(2,6,23,.06);
+      padding: 12px 14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .obs-card::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(900px 240px at -10% -20%, rgba(139,92,246,.10), transparent 60%),
+        radial-gradient(700px 240px at 110% 0%, rgba(245,158,11,.10), transparent 55%);
+      pointer-events:none;
+    }
+    .obs-card .top{
+      position:relative;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .obs-card .meta{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      font-size:12px;
+      font-weight:1000;
+      color:#006666;
+    }
+    .obs-card .meta span{ color:var(--muted); font-weight:900; }
+    .obs-card .text{
+      position:relative;
+      margin-top:10px;
+      color: var(--text);
+      font-size:12px;
+      font-weight:800;
+      line-height:1.35;
+      white-space:pre-wrap;
+    }
+    .obs-card .actions{
+      position:relative;
+      display:flex;
+      gap:8px;
+      justify-content:flex-end;
+      margin-top:10px;
+    }
+
+    @media (min-width:860px){ .obs-card{ grid-column: span 6; } }
+    @media (min-width:1140px){ .obs-card{ grid-column: span 4; } }
+
+    /* ========= FOOTER ========= */
+    footer{
+      margin-top:16px;
+      padding:14px 10px 0;
+      color:#ffffff;
+      font-size:12px;
+      text-align:center;
+      opacity:.95;
+      font-weight:700;
+    }
+
+    /* helpers */
+    .hidden{ display:none !important; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="topbar">
+        <div class="brand">
+          <div class="title-block">
+            <h1>PROJETO BRUMADINHO DIGITAL</h1>
+            <div class="sub">
+              Modernização e Ampliação da cobertura de telefonia celular e internet móvel.
+            </div>
+          </div>
+        </div>
+
+        <!-- NAV DESKTOP -->
+        <nav class="nav" aria-label="Navegação">
+          <a href="#/home" data-route="home"><span class="pill-dot"></span>Home</a>
+          <a href="#/cronograma" data-route="cronograma"><span class="pill-dot"></span>Cronograma</a>
+          <a href="#/mobilizacao" data-route="mobilizacao"><span class="pill-dot"></span>Mobilização</a>
+          <a href="#/inspecoes" data-route="inspecoes"><span class="pill-dot"></span>Inspeções</a>
+          <a href="#/torres" data-route="torres"><span class="pill-dot"></span>Torres</a>
+          <a href="#/observacoes" data-route="observacoes"><span class="pill-dot"></span>Observações</a>
+        </nav>
+
+        <div class="nav-actions">
+          <button class="btn hamburger" id="btn-hamburger" type="button" aria-label="Abrir menu">
+            <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
+
+      <!-- LOGO (dentro do cabeçalho / topbar) -->
+      <div class="logo" aria-label="Logo Vale">
+          <img id="vale-logo" class="vale-logo" alt="Vale" src="img/vale_logo.png" loading="lazy" />
+        </div>
+    </div>
+      </div>
+
+      <!-- NAV MOBILE -->
+      <div class="mobile-nav" id="mobile-nav" aria-label="Navegação móvel">
+        <a href="#/home" data-route="home">🏠 Home</a>
+        <a href="#/cronograma" data-route="cronograma">🗓️ Cronograma</a>
+        <a href="#/mobilizacao" data-route="mobilizacao">👷 Mobilização</a>
+        <a href="#/inspecoes" data-route="inspecoes">✅ Inspeções</a>
+        <a href="#/torres" data-route="torres">📡 Torres</a>
+        <a href="#/observacoes" data-route="observacoes">📝 Observações</a>
+      </div>
+    </div>
+
+    <!-- ===================== HOME ===================== -->
+    <main class="page active" id="page-home" data-page="home">
+      <section class="section" aria-label="Mapa interativo com torres celulares">
+        <div class="statusbar" aria-label="Resumo de Status">
+          <div class="left-title">Status das torres</div>
+          <div class="kpi-row">
+            <div class="kpi"><span class="dot green"></span> Ativadas <strong id="hdr-ativadas">00</strong></div>
+            <div class="kpi"><span class="dot purple"></span> Aguardando <strong id="hdr-aguardando">00</strong></div>
+            <div class="kpi"><span class="dot blue"></span> Em andamento <strong id="hdr-andamento">00</strong></div>
+            <div class="kpi"><span class="dot amber"></span> Alvarás pend. <strong id="hdr-alvara">00</strong></div>
+            <div class="kpi"><span class="dot amber"></span> Licenças pend. <strong id="hdr-licenca">00</strong></div>
+          </div>
+        </div>
+
+        <div id="map" role="application"></div>
+
+        <div class="filters" aria-label="Filtros rápidos (mapa)">
+          <div class="group" aria-label="Filtros">
+            <strong>Filtros</strong>
+            <label><input type="checkbox" id="qk-ativas" checked> Ativas</label>
+            <label><input type="checkbox" id="qk-andamento" checked> Em andamento</label>
+            <label><input type="checkbox" id="qk-aguardando" checked> Aguardando</label>
+            <label><input type="checkbox" id="qk-pendentes"> Pendências (Lic/Alv)</label>
+            <button type="button" id="btn-reset" class="btn-reset">Limpar filtros</button>
+          </div>
+
+          <!-- grupos ocultos (mantidos para lógica interna) -->
+          <div class="group hidden" id="tipo-group">
+            <label><input type="checkbox" value="Implantação de nova Torre" checked> Nova torre</label>
+            <label><input type="checkbox" value="Implantação em Torre Existente" checked> Torre existente</label>
+            <label><input type="checkbox" value="Modernização em Torre Existente" checked> Modernização</label>
+          </div>
+          <div class="group hidden" id="status-group">
+            <label><input type="checkbox" value="Torre Ativa em funcionamento" checked> Ativa</label>
+            <label><input type="checkbox" value="Torre em Ativação" checked> Em ativação</label>
+            <label><input type="checkbox" value="Torre Aguardando Inicio da Implantação" checked> Aguardando</label>
+            <label><input type="checkbox" value="Implantação em Andamento" checked> Em andamento</label>
+          </div>
+          <div class="group hidden" id="lic-group">
+            <label><input type="checkbox" value="LICENÇA EMITIDA" checked> Emitida</label>
+            <label><input type="checkbox" value="PENDENTE" checked> Pendente</label>
+            <label><input type="checkbox" value="NÃO INFORMADO" checked> N/I</label>
+          </div>
+          <div class="group hidden" id="alvara-group">
+            <label><input type="checkbox" value="ALVARÁ EXPEDIDO" checked> Expedido</label>
+            <label><input type="checkbox" value="PENDENTE" checked> Pendente</label>
+            <label><input type="checkbox" value="NÃO INFORMADO" checked> N/I</label>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===================== CRONOGRAMA ===================== -->
+ <main class="page" id="page-cronograma" data-page="cronograma">
+  <div class="page-hero">
+   <div class="title">
+    <strong>Cronograma previsto</strong>
+    <span>Visão consolidada com status por torre, datas de início e término, e avanço geral do projeto (20 torres).</span>
+   </div>
+   <button class="btn primary" type="button" data-home>⬅ Voltar para Home</button>
+  </div>
+
+  <section class="section" aria-label="Cronograma e avanço do projeto">
+   <div class="section-header">
+    <h2>Cronograma</h2>
+    <div class="hint">Ativas • Em andamento • Pendentes</div>
+   </div>
+
+   <div class="timeline">
+    <!-- Progresso (0% a 100%) -->
+    <div class="progress-panel" id="crono-progress" aria-label="Progresso do projeto">
+     <div class="progress-head">
+      <div class="ph-left">
+       <div class="ph-title">Avanço do projeto</div>
+       <div class="ph-sub">0% a 100% (total de <strong id="crono-total">20</strong> torres)</div>
+      </div>
+      <div class="ph-right" aria-label="Resumo do avanço">
+       <span class="badge b-green">✅ Ativadas: <strong id="crono-ativas">0</strong></span>
+       <span class="badge b-blue">🏗️ Em obras: <strong id="crono-obras">0</strong></span>
+       <span class="badge b-purple">⏳ Pendentes: <strong id="crono-pendentes">0</strong></span>
+      </div>
+     </div>
+
+     <div class="progress-bar" role="img" aria-label="Barra de progresso empilhada">
+      <div class="seg seg-ativa" title="Ativadas"></div>
+      <div class="seg seg-obras" title="Em obras"></div>
+      <div class="seg seg-pendente" title="Pendentes"></div>
+      <div class="progress-glow" aria-hidden="true"></div>
+     </div>
+
+     <div class="progress-scale" aria-hidden="true">
+      <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+     </div>
+     <div class="progress-note" id="crono-percent">Progresso: 0%</div>
+    </div>
+
+    <!-- Tabela simples -->
+    <div class="table-wrap" style="padding:14px 0 0;">
+     <table class="table" aria-label="Tabela do cronograma por torre">
+      <thead>
+       <tr>
+        <th style="width:18%">Status</th>
+        <th style="width:16%">Torre ID</th>
+        <th>Localidade</th>
+        <th style="width:18%">Início</th>
+        <th style="width:18%">Término</th>
+       </tr>
+      </thead>
+      <tbody id="cronograma-table"></tbody>
+     </table>
+    </div>
+   </div>
+  </section>
+ </main>
+ <!-- ===================== MOBILIZAÇÃO ===================== -->
+    <main class="page" id="page-mobilizacao" data-page="mobilizacao">
+      <div class="page-hero">
+        <div class="title">
+          <strong>Mobilização</strong>
+          <span>Dashboard consolidado e detalhamento por empresa.</span>
+        </div>
+        <button class="btn primary" type="button" data-home>⬅ Voltar para Home</button>
+      </div>
+
+      <section class="section" aria-label="Resumo da Mobilização">
+        <div class="section-header">
+          <h2>Dashboard de mobilização</h2>
+          <div class="hint">Totais consolidados</div>
+        </div>
+        <div class="cards">
+          <div class="grid" id="mobilizacao-grid"></div>
+        </div>
+      </section>
+
+      <section class="section" aria-label="Empresas mobilizadas">
+        <div class="section-header">
+          <h2>Empresas mobilizadas</h2>
+          <div class="hint">Detalhamento operacional</div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table" aria-label="Tabela de mobilização por empresa">
+            <thead>
+              <tr>
+                <th style="width:44%">Empresa</th>
+                <th>Colaboradores</th>
+                <th>Veículos</th>
+                <th>Máquinas</th>
+                <th>Equipamentos</th>
+              </tr>
+            </thead>
+            <tbody id="mobilizacao-table"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===================== INSPEÇÕES ===================== -->
+    <main class="page" id="page-inspecoes" data-page="inspecoes">
+      <div class="page-hero">
+        <div class="title">
+          <strong>Inspeções</strong>
+          <span>Resumo das inspeções realizadas por ano.</span>
+        </div>
+        <button class="btn primary" type="button" data-home>⬅ Voltar para Home</button>
+      </div>
+
+      <section class="section" aria-label="Inspeções realizadas">
+        <div class="section-header">
+          <h2>Resumo de inspeções</h2>
+          <div class="hint">Cards e total geral</div>
+        </div>
+        <div class="cards">
+          <div class="grid" id="inspecoes-grid"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===================== TORRES ===================== -->
+    <main class="page" id="page-torres" data-page="torres">
+      <div class="page-hero">
+        <div class="title">
+          <strong>Torres</strong>
+          <span>Dashboard de status + lista completa. Clique em um card para ver detalhes.</span>
+        </div>
+        <button class="btn primary" type="button" data-home>⬅ Voltar para Home</button>
+      </div>
+
+      <section class="section" aria-label="Dashboard resumo de status das torres">
+        <div class="section-header">
+          <h2>Resumo de status</h2>
+          <div class="hint">Mesmo resumo do topo do mapa</div>
+        </div>
+        <div class="cards">
+          <div class="grid" id="torres-dashboard"></div>
+        </div>
+      </section>
+
+      <section class="section" aria-label="Todas as torres">
+        <div class="section-header">
+          <h2>Todas as torres</h2>
+          <div class="hint">Lista acompanha o filtro “Pendências”</div>
+        </div>
+        <div class="cards">
+          <div class="grid" id="towers-grid"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===================== OBSERVAÇÕES ===================== -->
+    <main class="page" id="page-observacoes" data-page="observacoes">
+      <div class="page-hero">
+        <div class="title">
+          <strong>Observações</strong>
+          <span>Painel pontual: registre observações por torre, salve e gerencie.</span>
+        </div>
+        <button class="btn primary" type="button" data-home>⬅ Voltar para Home</button>
+      </div>
+
+      <section class="section" aria-label="Painel de Observações">
+        <div class="section-header">
+          <h2>Painel</h2>
+          <div class="hint">Salvar / apagar / limpar</div>
+        </div>
+
+        <div class="obs-wrap">
+          <div class="obs-form" aria-label="Formulário de observações">
+            <div class="form-grid">
+              <div class="field span-4">
+                <label for="obs-torre">Torre (ID)</label>
+                <select id="obs-torre"></select>
+              </div>
+
+              <div class="field span-4">
+                <label for="obs-tipo">Tipo</label>
+                <select id="obs-tipo">
+                  <option value="Geral">Geral</option>
+                  <option value="Risco">Risco</option>
+                  <option value="Pendência">Pendência</option>
+                  <option value="Ação">Ação</option>
+                  <option value="Informativo">Informativo</option>
+                </select>
+              </div>
+
+              <div class="field span-4">
+                <label for="obs-data">Data</label>
+                <input id="obs-data" type="date" />
+              </div>
+
+              <div class="field span-12">
+                <label for="obs-texto">Observação</label>
+                <textarea id="obs-texto" placeholder="Descreva a observação objetivamente..."></textarea>
+              </div>
+            </div>
+
+            <div class="obs-actions">
+              <button class="btn" type="button" id="btn-obs-limpar">🧹 Limpar campos</button>
+              <button class="btn" type="button" id="btn-obs-limpar-tudo">🗑️ Limpar painel</button>
+              <button class="btn primary" type="button" id="btn-obs-salvar">💾 Salvar observação</button>
+            </div>
+          </div>
+
+          <div class="obs-cards" id="obs-cards" aria-label="Lista de observações"></div>
+        </div>
+      </section>
+    </main>
+
+    <div class="hidden" id="error">Aviso: não foi possível carregar limite municipal (GeoJSON). Verifique conexão/restrições do navegador.</div>
+
+    <footer>©2026 • Gerência de Fomento Econômico • Brumadinho Digital • Uso interno.</footer>
+  </div>
+
+  <!-- MODAL TORRE -->
+  <div class="modal" id="tower-modal" role="dialog" aria-modal="true" aria-labelledby="tower-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="tower-modal-title">Torre</div>
+          <div class="modal-sub" id="tower-modal-sub">Detalhes</div>
+        </div>
+        <button class="modal-close" id="tower-modal-close" type="button">Fechar</button>
+      </div>
+      <div class="modal-body" id="tower-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+
+  <script>
+    (function(){
+      /* =============================
+         Assets (offline-friendly)
+      ============================== */
+      const LOGO_REL = "img/vale_logo.png";
+      const LOGO_WEB = "https://upload.wikimedia.org/wikipedia/commons/2/2f/Vale_logo.svg";
+      const TOWER_ICON_REL = "img/tower.png";
+
+      // fallback do logo
+      const logoEl = document.getElementById("vale-logo");
+      if (logoEl){
+        logoEl.src = LOGO_REL;
+        logoEl.addEventListener("error", () => { logoEl.src = LOGO_WEB; });
+      }
+
+      /* =============================
+         DADOS (base do seu HTML)
+      ============================== */
+
+      // ✅ INSPEÇÕES POR ANO (EDITAR MANUALMENTE)
+      const INSPECOES_POR_ANO = { 2025: 21, 2026: 10 };
+
+      const STATUS_META = {
+        'Torre Ativa em funcionamento':{ dot:'status-green', chip:'b-green', label:'Ativa' },
+        'Torre em Ativação':{ dot:'status-blue', chip:'b-blue', label:'Em ativação' },
+        'Torre Aguardando Inicio da Implantação':{ dot:'status-purple', chip:'b-purple', label:'Aguardando' },
+        'Implantação em Andamento': { dot:'status-blue', chip:'b-blue', label:'Em andamento' }
+      };
+
+      const LIC_ALVARA = {
+        MGPPY:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
+        MGEKS:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
+        MGKRF:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
+        MGCRF:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
+        MGQLS:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
+        MGARW:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
+        MGRBD:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
+        MGCIK:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
+        MGARX:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
+        MGAKL:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
+        MGKRM:{lic:'PENDENTE', alv:'PENDENTE'},
+        MGJSK:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
+        MGEXQ:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
+        MGTKC:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
+        MGKRV:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
+        MGMFK:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
+        MGBJU:{lic:'PENDENTE', alv:'PENDENTE'},
+        MGIPA:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
+        MGKRA:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
+        MGPKL:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'}
+      };
+
+      const COMPANIES = [
+        { id:'TEL', nome:'TEL TELECOMUNICACOES LTDA', mobilizacao:{ colab:7, veiculos:2, maquinas:0, equipamentos:0 } },
+        { id:'AMCC', nome:'A M C C TELECOM LTDA', mobilizacao:{ colab:6, veiculos:1, maquinas:0, equipamentos:0 } },
+        { id:'ALLIANCE', nome:'ALLIANCE SERVICES PLUS', mobilizacao:{ colab:6, veiculos:1, maquinas:0, equipamentos:1 } },
+        { id:'ICOMON', nome:'ICOMON TECNOLOGIA LTDA', mobilizacao:{ colab:5, veiculos:1, maquinas:0, equipamentos:0 } },
+        { id:'FRANZOL', nome:'A.L.FRANZOL & MENDES LTDA', mobilizacao:{ colab:8, veiculos:1, maquinas:0, equipamentos:0 } },
+        { id:'ROSANA', nome:'ROSANA DEL BUONO', mobilizacao:{ colab:3, veiculos:1, maquinas:1, equipamentos:0 } },
+        { id:'TELEQUIPE', nome:'TELEQUIPE PROJETOS', mobilizacao:{ colab:8, veiculos:2, maquinas:0, equipamentos:1 } }
+      ];
+
+      const COMPANY_BY_ID = Object.fromEntries(COMPANIES.map(c => [c.id, c]));
+
+      const TOWER_ASSIGNMENTS = {
+        'MGEKS': ['TEL','AMCC','TELEQUIPE'],
+        'MGCIK': ['ICOMON','FRANZOL','ALLIANCE','ROSANA']
+      };
+
+      const TORRES = [
+        { id:'MGIPA', nome:'BRUMADINHO - PIEDADE DO PARAOPEBA', tipo:'Modernização em Torre Existente', lat:-20.169611, lng:-44.01875, status:'Torre Ativa em funcionamento' },
+        { id:'MGAKL', nome:'BRUMADINHO ÁGUAS CLARAS', tipo:'Implantação de nova Torre', lat:-20.192362, lng:-44.204888, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGARW', nome:'BRUMADINHO CACHOEIRA DAS ALMORREIMAS', tipo:'Implantação de nova Torre', lat:-20.173309, lng:-44.155957, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGARX', nome:'BRUMADINHO PONTE DAS ALMORREIMAS', tipo:'Implantação de nova Torre', lat:-20.198044, lng:-44.174273, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGBJU', nome:'BRUMADINHO TEJUCO', tipo:'Implantação de nova Torre', lat:-20.124972, lng:-44.163199, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGCIK', nome:'BRUMADINHO CONCEIÇÃO DE ITAGUÁ', tipo:'Implantação de nova Torre', lat:-20.195297, lng:-44.238975, status:'Implantação em Andamento' },
+        { id:'MGCRF', nome:'BRUMADINHO CÓRREGO DE ALMAS', tipo:'Implantação de nova Torre', lat:-20.213412, lng:-44.056493, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGEKS', nome:'BRUMADINHO ARANHA ENCOSTA DA SERRA', tipo:'Implantação de nova Torre', lat:-20.245801, lng:-44.005216, status:'Implantação em Andamento' },
+        { id:'MGEXQ', nome:'BRUMADINHO LOCALIDADE EIXO QUEBRADO', tipo:'Implantação de nova Torre', lat:-20.224244, lng:-44.202524, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGJSK', nome:'BRUMADINHO SÃO JOSÉ DO PARAOPEBA', tipo:'Implantação de nova Torre', lat:-20.30699, lng:-44.076897, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGKRA', nome:'BRUMADINHO CASA BRANCA RECANTO DA ALDEIA', tipo:'Implantação em Torre Existente', lat:-20.085327, lng:-44.04063, status:'Torre Ativa em funcionamento' },
+        { id:'MGKRF', nome:'BRUMADINHO LOCALIDADE CÓRREGO DO FEIJÃO', tipo:'Implantação de nova Torre', lat:-20.135867, lng:-44.108318, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGKRM', nome:'BRUMADINHO QUINTAS DO RIO MANSO', tipo:'Implantação de nova Torre', lat:-20.170518, lng:-44.246529, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGKRV', nome:'BRUMADINHO CASA BRANCA RECANTO DO VALE', tipo:'Implantação de nova Torre', lat:-20.094703, lng:-44.049343, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGMFK', nome:'BRUMADINHO MELO FRANCO', tipo:'Implantação de nova Torre', lat:-20.176064, lng:-44.133761, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGPKL', nome:'BRUMADINHO PARQUE DO LAGO', tipo:'Implantação em Torre Existente', lat:-20.143119, lng:-44.157913, status:'Torre Ativa em funcionamento' },
+        { id:'MGPPY', nome:'BRUMADINHO PIEDADE PARAOPEBA MARQUES', tipo:'Implantação de nova Torre', lat:-20.191013, lng:-44.051539, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGQLS', nome:'BRUMADINHO QUILOMBO DO SAPE E RODRIGUES', tipo:'Implantação de nova Torre', lat:-20.266763, lng:-44.065006, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGRBD', nome:'BRUMADINHO RETIRO DO BRUMADO', tipo:'Implantação de nova Torre', lat:-20.152368, lng:-44.248397, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGTKC', nome:'BRUMADINHO TOCA DE CIMA', tipo:'Implantação de nova Torre', lat:-20.224508, lng:-44.125745, status:'Torre Aguardando Inicio da Implantação' }
+      ].map(t => {
+        const extra = LIC_ALVARA[t.id];
+        return { ...t, licenciamento: extra ? extra.lic : 'NÃO INFORMADO', alvara: extra ? extra.alv : 'NÃO INFORMADO' };
+      });
+
+      /* =============================
+         CRONOGRAMA / DATAS (tabela do Guilherme)
+         - mapeamento: MG_CIK -> MGCIK etc.
+         - usamos: InicioObra e TerminoAtivacao (como você pediu)
+      ============================== */
+      const CRONOGRAMA_TABELA_RAW = [
+        { id:"MG_CIK", inicioObra:"fev-26", terminoObra:"abr-26", inicioAtiv:"jul-26", terminoAtiv:"ago-26" },
+        { id:"MG_EKS", inicioObra:"fev-26", terminoObra:"abr-26", inicioAtiv:"jul-26", terminoAtiv:"ago-26" },
+        { id:"MG_CRF", inicioObra:"mar-26", terminoObra:"mai-26", inicioAtiv:"ago-26", terminoAtiv:"ago-26" },
+        { id:"MG_AKL", inicioObra:"mar-26", terminoObra:"mai-26", inicioAtiv:"ago-26", terminoAtiv:"ago-26" },
+        { id:"MG_QLS", inicioObra:"abr-26", terminoObra:"jun-26", inicioAtiv:"ago-26", terminoAtiv:"set-26" },
+        { id:"MG_PPY", inicioObra:"abr-26", terminoObra:"jun-26", inicioAtiv:"ago-26", terminoAtiv:"set-26" },
+        { id:"MG_ARW", inicioObra:"mai-26", terminoObra:"jul-26", inicioAtiv:"set-26", terminoAtiv:"out-26" },
+        { id:"MG_RDB", inicioObra:"mai-26", terminoObra:"jul-26", inicioAtiv:"set-26", terminoAtiv:"out-26" },
+        { id:"MG_KRF", inicioObra:"jun-26", terminoObra:"ago-26", inicioAtiv:"out-26", terminoAtiv:"out-26" },
+        { id:"MG_ARX", inicioObra:"jun-26", terminoObra:"ago-26", inicioAtiv:"fev-27", terminoAtiv:"fev-27" }
+      ];
+
+      const ID_MAP = {
+        "MG_CIK":"MGCIK",
+        "MG_EKS":"MGEKS",
+        "MG_CRF":"MGCRF",
+        "MG_AKL":"MGAKL",
+        "MG_QLS":"MGQLS",
+        "MG_PPY":"MGPPY",
+        "MG_ARW":"MGARW",
+        "MG_RDB":"MGRBD",
+        "MG_KRF":"MGKRF",
+        "MG_ARX":"MGARX",
+        "MG_IPA":"MGIPA",
+        "MG_PKL":"MGPKL",
+        "MG_KRA":"MGKRA"
+      };
+
+      const CRONOGRAMA_BY_ID = {};
+      CRONOGRAMA_TABELA_RAW.forEach(r => {
+        const k = ID_MAP[r.id] || r.id.replaceAll("_","");
+        CRONOGRAMA_BY_ID[k] = {
+          inicioObra: r.inicioObra,
+          terminoAtivacao: r.terminoAtiv
+        };
+      });
+
+      // Para as 3 já ativas e prontas (sem datas fornecidas), marcamos como concluída.
+      ["MGIPA","MGPKL","MGKRA"].forEach(id => {
+        if (!CRONOGRAMA_BY_ID[id]){
+          CRONOGRAMA_BY_ID[id] = {
+            inicioObra: "Concluída (Ativa)",
+            terminoAtivacao: "Concluída (Ativa)"
+          };
+        }
+      });
+
+      const MESES_PT = { jan:0, fev:1, mar:2, abr:3, mai:4, jun:5, jul:6, ago:7, set:8, out:9, nov:10, dez:11 };
+      function parseMesAno(txt){
+        // "fev-26" -> Date(2026,1,1)
+        if (!txt || txt.includes("Concluída") || txt === "—") return null;
+        const parts = String(txt).toLowerCase().split("-");
+        if (parts.length !== 2) return null;
+        const m = MESES_PT[parts[0].trim()];
+        const y = 2000 + parseInt(parts[1].trim(), 10);
+        if (Number.isNaN(m) || Number.isNaN(y)) return null;
+        return new Date(y, m, 1);
+      }
+
+      /* =============================
+         HELPERS UI
+      ============================== */
+      const two = n => String(n).padStart(2,'0');
+
+      function chipStatus(t){
+        const meta = STATUS_META[t.status] || { chip:'b-gray', label:t.status };
+        return `<span class="badge ${meta.chip}">${meta.label}</span>`;
+      }
+      function chipLic(v){
+        if (v==='LICENÇA EMITIDA') return `<span class="badge b-green">Licença emitida</span>`;
+        if (v==='PENDENTE') return `<span class="badge b-amber">Licença pendente</span>`;
+        return `<span class="badge b-gray">Licença N/I</span>`;
+      }
+      function chipAlv(v){
+        if (v==='ALVARÁ EXPEDIDO') return `<span class="badge b-green">Alvará expedido</span>`;
+        if (v==='PENDENTE') return `<span class="badge b-amber">Alvará pendente</span>`;
+        return `<span class="badge b-gray">Alvará N/I</span>`;
+      }
+      function isPendencia(t){
+        return (t.alvara === 'PENDENTE' || t.licenciamento === 'PENDENTE');
+      }
+      function getCronoFor(id){
+        return CRONOGRAMA_BY_ID[id] || { inicioObra:"—", terminoAtivacao:"—" };
+      }
+
+      /* =============================
+         PÁGINAS / ROTAS
+      ============================== */
+      const pages = Array.from(document.querySelectorAll(".page"));
+      const navLinks = Array.from(document.querySelectorAll("[data-route]"));
+
+      function setActiveNav(route){
+        navLinks.forEach(a => a.classList.toggle("active", a.getAttribute("data-route") === route));
+      }
+      function showPage(route){
+        pages.forEach(p => p.classList.toggle("active", p.getAttribute("data-page") === route));
+        setActiveNav(route);
+        if (route === "home") {
+          setTimeout(() => { if (map) { try { map.invalidateSize(); } catch(e){} } renderResumo(currentVisible); }, 250);
+        }
+      }
+      function getRoute(){
+        const h = (location.hash || "#/home").replace("#/","");
+        return h || "home";
+      }
+      window.addEventListener("hashchange", () => {
+        const r = getRoute();
+        showPage(r);
+        closeMobileNav();
+      });
+
+      const __btnGoHome = document.getElementById("btn-go-home");
+      if (__btnGoHome){ __btnGoHome.addEventListener("click", () => { location.hash = "#/home"; }); }
+document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("click", () => { location.hash = "#/home"; }));
+
+      const btnHamburger = document.getElementById("btn-hamburger");
+      const mobileNav = document.getElementById("mobile-nav");
+      function toggleMobileNav(){ mobileNav.classList.toggle("open"); }
+      function closeMobileNav(){ mobileNav.classList.remove("open"); }
+      btnHamburger.addEventListener("click", toggleMobileNav);
+
+      /* =============================
+         RENDER: CRONOGRAMA (atualizado)
+      ============================== */
+      function getCronoGroup(t){
+        // Normaliza para os 3 grupos pedidos
+        if (t.status === 'Torre Ativa em funcionamento') return { key:'Ativa', order:0, dot:'led-green' };
+        if (t.status === 'Implantação em Andamento' || t.status === 'Torre em Ativação') return { key:'Em andamento', order:1, dot:'led-blue' };
+        return { key:'Pendente', order:2, dot:'led-purple' };
+      }
+      function renderCronograma(){
+        const tbody = document.getElementById('cronograma-table');
+        const progress = document.getElementById('crono-progress');
+        if (!tbody) return;
+
+        // Contagens (base nas 20 torres do projeto)
+        const total = TORRES.length;
+        const ativas = TORRES.filter(t => getCronoGroup(t).key === 'Ativa').length;
+        const obras  = TORRES.filter(t => getCronoGroup(t).key === 'Em andamento').length;
+        const pend   = TORRES.filter(t => getCronoGroup(t).key === 'Pendente').length;
+
+        // Atualiza números
+        const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        setTxt('crono-total', total);
+        setTxt('crono-ativas', ativas);
+        setTxt('crono-obras', obras);
+        setTxt('crono-pendentes', pend);
+
+        // Percentuais (0% a 100%)
+        const pctAtiva = total ? (ativas/total*100) : 0;
+        const pctObras = total ? (obras/total*100) : 0;
+        const pctPend  = Math.max(0, 100 - pctAtiva - pctObras);
+
+        if (progress){
+          progress.style.setProperty('--pct-ativa', pctAtiva.toFixed(2) + '%');
+          progress.style.setProperty('--pct-obras', pctObras.toFixed(2) + '%');
+          progress.style.setProperty('--pct-pendente', pctPend.toFixed(2) + '%');
+        }
+        const pctText = document.getElementById('crono-percent');
+        if (pctText){
+          pctText.textContent = `Progresso: ${pctAtiva.toFixed(0)}% concluído (Ativas) • ${(pctAtiva+pctObras).toFixed(0)}% em execução (Ativas + Obras)`;
+        }
+
+        // Monta linhas com ordenação: Ativas -> Em Andamento -> Pendentes
+        const items = TORRES.map(t => {
+          const c = getCronoFor(t.id);
+          const g = getCronoGroup(t);
+          const keyDate = parseMesAno(c.inicioObra) || (g.key === 'Ativa' ? new Date(1900,0,1) : new Date(2100,0,1));
+          return {
+            id: t.id,
+            nome: t.nome,
+            status: g.key,
+            order: g.order,
+            dot: g.dot,
+            inicioObra: c.inicioObra || '—',
+            terminoAtivacao: c.terminoAtivacao || '—',
+            sortKey: keyDate
+          };
+        }).sort((a,b) => (a.order - b.order) || (a.sortKey - b.sortKey) || (a.id.localeCompare(b.id)));
+
+        tbody.innerHTML = items.map(x => {
+          const badgeCls = x.status === 'Ativa' ? 'b-green' : (x.status === 'Em andamento' ? 'b-blue' : 'b-purple');
+          const statusLabel = x.status === 'Ativa' ? 'Ativa' : (x.status === 'Em andamento' ? 'Em andamento' : 'Pendente');
+          return `
+            <tr>
+              <td>
+                <div class="status-cell">
+                  <span class="status-led ${x.dot} blink-fast" aria-hidden="true"></span>
+                  <span class="badge ${badgeCls}">${statusLabel}</span>
+                </div>
+              </td>
+              <td>
+                <div class="id-cell">
+                  <span class="status-led ${x.dot} blink-fast" aria-hidden="true"></span>
+                  ${x.id}
+                </div>
+              </td>
+              <td><div style="font-weight:900">${x.nome}</div></td>
+              <td>${x.inicioObra}</td>
+              <td>${x.terminoAtivacao}</td>
+            </tr>`;
+        }).join('');
+      }
+
+      /* =============================
+         RENDER: MOBILIZAÇÃO
+      ============================== */
+      function calcMobilizacao(){
+        const totals = { empresas: COMPANIES.length, colaboradores:0, veiculos:0, maquinas:0, equipamentos:0 };
+        COMPANIES.forEach(c => {
+          totals.colaboradores += c.mobilizacao.colab || 0;
+          totals.veiculos += c.mobilizacao.veiculos || 0;
+          totals.maquinas += c.mobilizacao.maquinas || 0;
+          totals.equipamentos += c.mobilizacao.equipamentos || 0;
+        });
+        return totals;
+      }
+
+      function renderMobilizacaoCards(){
+        const mob = calcMobilizacao();
+        const items = [
+          { label:'Empresas mobilizadas', value: mob.empresas, icon:'🏢' },
+          { label:'Colaboradores mobilizados', value: mob.colaboradores, icon:'👷' },
+          { label:'Veículos mobilizados', value: mob.veiculos, icon:'🚙' },
+          { label:'Máquinas mobilizadas', value: mob.maquinas, icon:'🏗️' },
+          { label:'Equipamentos mobilizados', value: mob.equipamentos, icon:'🧰' }
+        ];
+        document.getElementById('mobilizacao-grid').innerHTML = items.map(x => `
+          <div class="stat-card">
+            <div class="inner">
+              <div>
+                <div class="label">${x.label}</div>
+                <div class="value">${two(x.value)}</div>
+              </div>
+              <div class="icon" aria-hidden="true">${x.icon}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderMobilizacaoTable(){
+        const tbody = document.getElementById("mobilizacao-table");
+        tbody.innerHTML = COMPANIES.map(c => `
+          <tr>
+            <td><div style="font-weight:1000;color:#006666">${c.nome}</div><div class="muted">ID: ${c.id}</div></td>
+            <td>${two(c.mobilizacao.colab || 0)}</td>
+            <td>${two(c.mobilizacao.veiculos || 0)}</td>
+            <td>${two(c.mobilizacao.maquinas || 0)}</td>
+            <td>${two(c.mobilizacao.equipamentos || 0)}</td>
+          </tr>
+        `).join("");
+      }
+
+      /* =============================
+         RENDER: INSPEÇÕES
+      ============================== */
+      function renderInspecoesCards(){
+        const a2025 = +INSPECOES_POR_ANO[2025] || 0;
+        const a2026 = +INSPECOES_POR_ANO[2026] || 0;
+        document.getElementById('inspecoes-grid').innerHTML = `
+          <div class="stat-card"><div class="inner"><div><div class="label">Inspeções realizadas (2025)</div><div class="value">${two(a2025)}</div></div><div class="icon">📅</div></div></div>
+          <div class="stat-card"><div class="inner"><div><div class="label">Inspeções realizadas (2026)</div><div class="value">${two(a2026)}</div></div><div class="icon">📅</div></div></div>
+          <div class="stat-card"><div class="inner"><div><div class="label">Total geral (2025 + 2026)</div><div class="value">${two(a2025+a2026)}</div></div><div class="icon">📌</div></div></div>
+        `;
+      }
+
+      /* =============================
+         MODAL TORRE
+      ============================== */
+      function openTowerModal(t){
+        document.getElementById('tower-modal-title').textContent = `${t.id} — ${t.nome}`;
+        document.getElementById('tower-modal-sub').textContent = `${t.tipo}`;
+
+        const ids = TOWER_ASSIGNMENTS[t.id] || [];
+        const list = ids.map(cid => COMPANY_BY_ID[cid]).filter(Boolean);
+
+        const empresasHTML = list.length ? `
+          <div class="kv">
+            <div class="row"><div class="k">Empresas atuando nesta torre</div><div class="v">${list.length}</div></div>
+            ${list.map(e=>`
+              <div class="row">
+                <div class="k">${e.nome}</div>
+                <div class="v">
+                  <span class="badge b-gray">Colab ${e.mobilizacao.colab}</span>
+                  <span class="badge b-gray">Veíc ${e.mobilizacao.veiculos}</span>
+                  <span class="badge b-gray">Máq ${e.mobilizacao.maquinas}</span>
+                  <span class="badge b-gray">Equip ${e.mobilizacao.equipamentos}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>` : `<div class="mini">Sem empresas listadas para esta torre no status atual.</div>`;
+
+        const cr = getCronoFor(t.id);
+
+        document.getElementById('tower-modal-body').innerHTML = `
+          <div class="kv">
+            <div class="row"><div class="k">Status operacional</div><div class="v">${chipStatus(t)} ${isPendencia(t) ? `<span class="badge b-amber">Pendência</span>` : `<span class="badge b-gray">OK</span>`}</div></div>
+            <div class="row"><div class="k">Início das obras</div><div class="v"><span class="badge b-gray">${cr.inicioObra || "—"}</span></div></div>
+            <div class="row"><div class="k">Término da ativação</div><div class="v"><span class="badge b-gray">${cr.terminoAtivacao || "—"}</span></div></div>
+            <div class="row"><div class="k">Licenciamento ambiental</div><div class="v">${chipLic(t.licenciamento)}</div></div>
+            <div class="row"><div class="k">Alvará de construção</div><div class="v">${chipAlv(t.alvara)}</div></div>
+            <div class="row"><div class="k">Coordenadas</div><div class="v">${t.lat.toFixed(6)}, ${t.lng.toFixed(6)}</div></div>
+          </div>
+          ${empresasHTML}
+        `;
+        document.getElementById('tower-modal').classList.add('open');
+      }
+      function closeTowerModal(){ document.getElementById('tower-modal').classList.remove('open'); }
+      document.getElementById('tower-modal-close').addEventListener('click', closeTowerModal);
+      document.getElementById('tower-modal').addEventListener('click', (e)=>{ if (e.target.id === 'tower-modal') closeTowerModal(); });
+
+      /* =============================
+         RENDER: TORRES LIST + DASHBOARD
+      ============================== */
+      function renderTowerCards(list){
+        const grid = document.getElementById('towers-grid');
+        grid.innerHTML = list.map(t => {
+          const cr = getCronoFor(t.id);
+          return `
+          <div class="tower-card" data-tower="${t.id}">
+            <div class="tower-left">
+              <div class="tower-id">${t.id}</div>
+              <div class="tower-name">${t.nome}</div>
+              <div class="tower-meta">${chipLic(t.licenciamento)} ${chipAlv(t.alvara)}</div>
+              <div class="tower-meta">
+                <span class="badge b-gray">🛠️ Início: ${cr.inicioObra || "—"}</span>
+                <span class="badge b-gray">📡 Término: ${cr.terminoAtivacao || "—"}</span>
+              </div>
+            </div>
+            <div class="tower-right">
+              ${chipStatus(t)}
+              <div class="tower-meta">${isPendencia(t) ? `<span class="badge b-amber">Pendência</span>` : `<span class="badge b-gray">OK</span>`}</div>
+            </div>
+          </div>`;
+        }).join('');
+
+        grid.querySelectorAll('.tower-card').forEach(el=>{
+          el.addEventListener('click', ()=>{
+            const tid = el.getAttribute('data-tower');
+            const t = TORRES.find(x=>x.id===tid);
+            if (t) openTowerModal(t);
+          });
+        });
+      }
+
+      function renderTorresDashboard(list){
+        const arr = Array.isArray(list) ? list : TORRES;
+
+        const totalAtivadas   = arr.filter(t => t.status === 'Torre Ativa em funcionamento').length;
+        const totalAguardando = arr.filter(t => t.status === 'Torre Aguardando Inicio da Implantação').length;
+        const totalAndamento  = arr.filter(t => t.status === 'Implantação em Andamento').length;
+        const totalAlvaraPend = arr.filter(t => t.alvara === 'PENDENTE').length;
+        const totalLicPend    = arr.filter(t => t.licenciamento === 'PENDENTE').length;
+
+        const items = [
+          { label:'Ativadas', value: totalAtivadas, icon:'✅' },
+          { label:'Aguardando', value: totalAguardando, icon:'⏳' },
+          { label:'Em andamento', value: totalAndamento, icon:'🏗️' },
+          { label:'Alvarás pendentes', value: totalAlvaraPend, icon:'📄' },
+          { label:'Licenças pendentes', value: totalLicPend, icon:'🌿' }
+        ];
+
+        document.getElementById("torres-dashboard").innerHTML = items.map(x => `
+          <div class="stat-card">
+            <div class="inner">
+              <div>
+                <div class="label">${x.label}</div>
+                <div class="value">${two(x.value)}</div>
+              </div>
+              <div class="icon">${x.icon}</div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      /* =============================
+         RESUMO NO TOPO DO MAPA (HOME)
+      ============================== */
+      function renderResumo(subset){
+        const arr = Array.isArray(subset) ? subset : TORRES;
+        const totalAtivadas   = arr.filter(t => t.status === 'Torre Ativa em funcionamento').length;
+        const totalAguardando = arr.filter(t => t.status === 'Torre Aguardando Inicio da Implantação').length;
+        const totalAndamento  = arr.filter(t => t.status === 'Implantação em Andamento').length;
+        const totalAlvaraPend = arr.filter(t => t.alvara === 'PENDENTE').length;
+        const totalLicPend    = arr.filter(t => t.licenciamento === 'PENDENTE').length;
+
+        const e = id => document.getElementById(id);
+        if (e('hdr-ativadas')) e('hdr-ativadas').textContent = two(totalAtivadas);
+        if (e('hdr-aguardando')) e('hdr-aguardando').textContent = two(totalAguardando);
+        if (e('hdr-andamento')) e('hdr-andamento').textContent = two(totalAndamento);
+        if (e('hdr-alvara')) e('hdr-alvara').textContent = two(totalAlvaraPend);
+        if (e('hdr-licenca')) e('hdr-licenca').textContent = two(totalLicPend);
+      }
+
+      /* =============================
+         MAPA (Leaflet)
+      ============================== */
+      let map = null;
+      let markers = [];
+      let bounds = [];
+      let currentVisible = TORRES.slice();
+
+      function addBaseLayer(){
+        try{
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+            attribution:'© OpenStreetMap © CARTO',
+            maxZoom:19,
+            subdomains:'abcd'
+          }).addTo(map);
+        }catch(e){}
+        setTimeout(()=>{
+          const ok = Object.keys(map._layers).some(k => map._layers[k] && map._layers[k].getTileUrl);
+          if(!ok){
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+              attribution:'© OpenStreetMap contributors',
+              maxZoom:19
+            }).addTo(map);
+          }
+        },200);
+      }
+
+      function createTowerIcon(dotCls, blink, opts = {}){
+        const { active = false, pending = false } = opts;
+
+        const signalHTML = active ? `
+          <div class="signal" aria-hidden="true">
+            <span class="wave"></span><span class="wave"></span><span class="wave"></span>
+          </div>` : '';
+
+        const warnHTML = pending ? `<span class="warning-pulse" aria-hidden="true"></span>` : '';
+
+        const imgCls = ['tower-icon-img'];
+        if (blink) imgCls.push('blink');
+        if (pending) imgCls.push('warn');
+
+        const html = `
+          <div class="tower-icon-wrap">
+            ${signalHTML}
+            ${warnHTML}
+            <img class="${imgCls.join(' ')}" src="${TOWER_ICON_REL}" alt="Torre">
+            <span class="status-dot ${dotCls}"></span>
+          </div>
+        `;
+
+        return L.divIcon({
+          className:'tower-div-icon',
+          html,
+          iconSize:[42,54],
+          iconAnchor:[21,54],
+          popupAnchor:[0,-46]
+        });
+      }
+
+      function initMap(){
+        if (typeof L === 'undefined') {
+          document.getElementById('map').innerHTML =
+            '<div style="padding:16px;color:#991b1b">Erro ao carregar Leaflet. Verifique sua conexão/CDN.</div>';
+          return;
+        }
+
+        map = L.map('map', { zoomControl:false, center:[-20.17,-44.15], zoom:12 });
+        addBaseLayer();
+        L.control.zoom({ position:'bottomright' }).addTo(map);
+
+        markers = [];
+        bounds = [];
+
+        TORRES.forEach(t => {
+          const meta = STATUS_META[t.status] || { dot:'status-blue' };
+          const pending = isPendencia(t);
+          const active = (t.status === 'Torre Ativa em funcionamento');
+
+          const dotCls = pending ? 'status-purple' : meta.dot;
+          const blink = (t.status === 'Implantação em Andamento' || t.status === 'Torre em Ativação');
+
+          const icon = createTowerIcon(dotCls, blink, { active, pending });
+          const marker = L.marker([t.lat, t.lng], { icon });
+
+          const cr = getCronoFor(t.id);
+
+          marker.bindPopup(`
+            <div style="min-width:300px">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div><strong style="color:#006341">${t.id}</strong></div>
+                <div>${chipStatus(t)}</div>
+              </div>
+
+              <div style="margin-top:6px;color:#334155;font-size:12px;line-height:1.25">${t.nome}</div>
+
+              <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                ${chipLic(t.licenciamento)} ${chipAlv(t.alvara)} ${pending ? `<span class="badge b-amber">Pendência</span>` : `<span class="badge b-gray">OK</span>`}
+              </div>
+
+              <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                <span class="badge b-gray">🛠️ Início das obras: <strong>${cr.inicioObra || "—"}</strong></span>
+                <span class="badge b-gray">📡 Término da ativação: <strong>${cr.terminoAtivacao || "—"}</strong></span>
+              </div>
+
+              <div style="margin-top:10px;font-size:12px;color:#475569">
+                <em>${t.tipo}</em><br/>
+                <span>Lat/Lng: ${t.lat.toFixed(6)}, ${t.lng.toFixed(6)}</span>
+              </div>
+
+              <div style="margin-top:10px">
+                <button type="button" data-open-tower="${t.id}"
+                  style="cursor:pointer;border:1px solid #e2e8f0;background:#fff;padding:8px 10px;border-radius:999px;font-weight:1000;color:#006341">
+                  Ver detalhes
+                </button>
+              </div>
+            </div>
+          `);
+
+          marker.on('popupopen', (e)=>{
+            const btn = e.popup.getElement().querySelector(`[data-open-tower="${t.id}"]`);
+            if (btn){
+              btn.addEventListener('click', () => openTowerModal(t), { once:true });
+            }
+          });
+
+          marker.addTo(map);
+          markers.push({ marker, ...t });
+          bounds.push([t.lat, t.lng]);
+        });
+
+        function updateSignalStrength(){
+          const z = map.getZoom() || 12;
+          const op = z >= 15 ? 0.95 : (z >= 13 ? 0.62 : 0.35);
+          markers.forEach(m => {
+            if (m.status === 'Torre Ativa em funcionamento') {
+              const el = m.marker.getElement();
+              if (el) el.style.setProperty('--signal-opacity', op);
+            }
+          });
+        }
+        map.on('zoomend', updateSignalStrength);
+        map.whenReady(updateSignalStrength);
+
+        try{ map.fitBounds(L.latLngBounds(bounds), { padding:[30,30] }); }catch(e){}
+
+        drawMunicipioBoundary();
+      }
+
+      function drawMunicipioBoundary(){
+        const url = "https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-31-mun.json";
+        fetch(url)
+          .then(r => r.json())
+          .then(geo => {
+            let feature = null;
+            if (geo && geo.features){
+              feature = geo.features.find(f => {
+                const vals = Object.values(f.properties || {}).map(v => String(v).toLowerCase());
+                return vals.some(v => v.includes("brumadinho"));
+              });
+            }
+            if (feature){
+              const boundary = L.geoJSON(feature, {
+                style: { color:'#ff006e', weight:2, opacity:0.9, fillColor:'#ff006e', fillOpacity:0.08 }
+              }).addTo(map);
+              const b1 = L.latLngBounds(bounds);
+              const b2 = boundary.getBounds();
+              b1.extend(b2);
+              map.fitBounds(b1, { padding:[40,40] });
+            }
+          })
+          .catch(err => {
+            console.warn("Falha ao carregar limite municipal", err);
+            document.getElementById("error").classList.remove("hidden");
+          });
+      }
+
+      /* =============================
+         FILTROS (HOME) -> afetam KPI + lista (página Torres)
+      ============================== */
+      function wireQuickFilters(){
+        const stAtivacao = document.querySelector('#status-group input[value="Torre em Ativação"]');
+        if (stAtivacao) stAtivacao.checked = false;
+
+        const qkAtivas = document.getElementById('qk-ativas');
+        const qkAndamento = document.getElementById('qk-andamento');
+        const qkAguardando = document.getElementById('qk-aguardando');
+        const qkPendentes = document.getElementById('qk-pendentes');
+        const btnReset = document.getElementById('btn-reset');
+
+        const stAtivas = document.querySelector('#status-group input[value="Torre Ativa em funcionamento"]');
+        const stAndamento = document.querySelector('#status-group input[value="Implantação em Andamento"]');
+        const stAguardando = document.querySelector('#status-group input[value="Torre Aguardando Inicio da Implantação"]');
+
+        function applySync(){
+          if (stAtivas) stAtivas.checked = qkAtivas.checked;
+          if (stAndamento) stAndamento.checked = qkAndamento.checked;
+          if (stAguardando) stAguardando.checked = qkAguardando.checked;
+          applyFilters();
+        }
+
+        function resetFilters(){
+          qkAtivas.checked = true;
+          qkAndamento.checked = true;
+          qkAguardando.checked = true;
+          qkPendentes.checked = false;
+          applySync();
+        }
+
+        [qkAtivas,qkAndamento,qkAguardando,qkPendentes].forEach(el => el && el.addEventListener('change', applySync));
+        if (btnReset) btnReset.addEventListener('click', resetFilters);
+
+        resetFilters();
+      }
+
+      function applyFilters(){
+        const tipos = Array.from(document.querySelectorAll('#tipo-group input:checked')).map(i=>i.value);
+        const ops = Array.from(document.querySelectorAll('#status-group input:checked')).map(i=>i.value);
+        const lic = Array.from(document.querySelectorAll('#lic-group input:checked')).map(i=>i.value);
+        const alv = Array.from(document.querySelectorAll('#alvara-group input:checked')).map(i=>i.value);
+
+        const pendFilterActive = !!document.getElementById('qk-pendentes')?.checked;
+
+        const visible = [];
+        markers.forEach(m => {
+          let show;
+          if (pendFilterActive) show = ops.includes(m.status) && (m.alvara==='PENDENTE' || m.licenciamento==='PENDENTE');
+          else show = tipos.includes(m.tipo) && ops.includes(m.status) && lic.includes(m.licenciamento) && alv.includes(m.alvara);
+
+          if (map){
+            if (show && !map.hasLayer(m.marker)) m.marker.addTo(map);
+            else if (!show && map.hasLayer(m.marker)) map.removeLayer(m.marker);
+          }
+
+          if (show) visible.push(m);
+        });
+
+        currentVisible = visible;
+        renderResumo(visible);
+        renderTowerCards(visible);
+        renderTorresDashboard(visible);
+      }
+
+      /* =============================
+         OBSERVAÇÕES (localStorage)
+      ============================== */
+      const LS_KEY = "bd_observacoes_v1";
+
+      function loadObs(){
+        try{ return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }catch(e){ return []; }
+      }
+      function saveObs(arr){
+        localStorage.setItem(LS_KEY, JSON.stringify(arr));
+      }
+      function escapeHTML(s){
+        return String(s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      }
+      function typeBadge(tipo){
+        const map = {
+          "Geral":"b-gray",
+          "Risco":"b-amber",
+          "Pendência":"b-purple",
+          "Ação":"b-blue",
+          "Informativo":"b-green"
+        };
+        const cls = map[tipo] || "b-gray";
+        return `<span class="badge ${cls}">${tipo}</span>`;
+      }
+
+      function renderObs(){
+        const list = loadObs();
+        const host = document.getElementById("obs-cards");
+        if (!list.length){
+          host.innerHTML = `<div class="mini">Nenhuma observação registrada ainda.</div>`;
+          return;
+        }
+        host.innerHTML = list.slice().reverse().map(o => `
+          <div class="obs-card" data-id="${o.id}">
+            <div class="top">
+              <div class="meta">
+                <div style="font-weight:1000;color:#006666">${escapeHTML(o.torre)}</div>
+                <span>•</span>
+                <div>${typeBadge(o.tipo)}</div>
+                <span>•</span>
+                <div style="color:var(--muted);font-weight:900">${escapeHTML(o.data || "—")}</div>
+              </div>
+            </div>
+            <div class="text">${escapeHTML(o.texto)}</div>
+            <div class="actions">
+              <button class="btn" type="button" data-del="${o.id}">🗑️ Apagar</button>
+            </div>
+          </div>
+        `).join("");
+
+        host.querySelectorAll("[data-del]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const id = btn.getAttribute("data-del");
+            const arr = loadObs().filter(x => x.id !== id);
+            saveObs(arr);
+            renderObs();
+          });
+        });
+      }
+
+      function initObs(){
+        const selTorre = document.getElementById("obs-torre");
+        selTorre.innerHTML = TORRES.map(t => `<option value="${t.id}">${t.id} — ${t.nome}</option>`).join("");
+
+        const inputData = document.getElementById("obs-data");
+        const d = new Date();
+        inputData.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+        document.getElementById("btn-obs-limpar").addEventListener("click", () => {
+          document.getElementById("obs-texto").value = "";
+          document.getElementById("obs-tipo").value = "Geral";
+        });
+
+        document.getElementById("btn-obs-limpar-tudo").addEventListener("click", () => {
+          saveObs([]);
+          renderObs();
+        });
+
+        document.getElementById("btn-obs-salvar").addEventListener("click", () => {
+          const torre = document.getElementById("obs-torre").value;
+          const tipo = document.getElementById("obs-tipo").value;
+          const data = document.getElementById("obs-data").value || "";
+          const texto = document.getElementById("obs-texto").value.trim();
+
+          if (!texto){
+            alert("Digite uma observação antes de salvar.");
+            return;
+          }
+          const arr = loadObs();
+          arr.push({
+            id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + "_" + Math.random().toString(16).slice(2),
+            torre, tipo, data, texto,
+            createdAt: Date.now()
+          });
+          saveObs(arr);
+          document.getElementById("obs-texto").value = "";
+          renderObs();
+        });
+
+        renderObs();
+      }
+
+      /* =============================
+         INIT
+      ============================== */
+      renderCronograma();
+      renderMobilizacaoCards();
+      renderMobilizacaoTable();
+      renderInspecoesCards();
+      renderTowerCards(TORRES);
+      renderTorresDashboard(TORRES);
+      renderResumo(TORRES);
+      initObs();
+
+      initMap();
+      wireQuickFilters();
+
+      const initial = getRoute();
+      showPage(initial);
+    })();
+  </script>
+</body>
+</html>
