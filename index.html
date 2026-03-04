@@ -845,7 +845,7 @@
 
       <!-- LOGO (dentro do cabeçalho / topbar) -->
       <div class="logo" aria-label="Logo Vale">
-          <img id="vale-logo" class="vale-logo" alt="Vale" src="img/vale_logo.png" loading="lazy" />
+          <img id="vale-logo" class="vale-logo" alt="Vale" src="./img/vale_logo.png" loading="lazy" />
         </div>
     </div>
       </div>
@@ -884,7 +884,9 @@
             <label><input type="checkbox" id="qk-andamento" checked> Em andamento</label>
             <label><input type="checkbox" id="qk-aguardando" checked> Aguardando</label>
             <label><input type="checkbox" id="qk-pendentes"> Pendências (Lic/Alv)</label>
-            <button type="button" id="btn-reset" class="btn-reset">Limpar filtros</button>
+            
+            <label><input type="checkbox" id="qk-vivo"> Torres Vivo</label>
+<button type="button" id="btn-reset" class="btn-reset">Limpar filtros</button>
           </div>
 
           <!-- grupos ocultos (mantidos para lógica interna) -->
@@ -1155,9 +1157,9 @@
       /* =============================
          Assets (offline-friendly)
       ============================== */
-      const LOGO_REL = "img/vale_logo.png";
+      const LOGO_REL = "./img/vale_logo.png";
       const LOGO_WEB = "https://upload.wikimedia.org/wikipedia/commons/2/2f/Vale_logo.svg";
-      const TOWER_ICON_REL = "img/tower.png";
+      const TOWER_ICON_REL = "./img/tower.png";
 
       // fallback do logo
       const logoEl = document.getElementById("vale-logo");
@@ -1191,12 +1193,12 @@
         MGCIK:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
         MGARX:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
         MGAKL:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
-        MGKRM:{lic:'PENDENTE', alv:'PENDENTE'},
-        MGJSK:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
-        MGEXQ:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
-        MGTKC:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
-        MGKRV:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
-        MGMFK:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
+        MGKRM:{lic:'PENDENTE', alv:'ALVARÁ EXPEDIDO'},
+        MGJSK:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
+        MGEXQ:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
+        MGTKC:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
+        MGKRV:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
+        MGMFK:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
         MGBJU:{lic:'PENDENTE', alv:'PENDENTE'},
         MGIPA:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
         MGKRA:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
@@ -1213,7 +1215,8 @@
         { id:'TELEQUIPE', nome:'TELEQUIPE PROJETOS', mobilizacao:{ colab:8, veiculos:2, maquinas:0, equipamentos:1 } }
       ];
 
-      const COMPANY_BY_ID = Object.fromEntries(COMPANIES.map(c => [c.id, c]));
+      var COMPANY_BY_ID = {};
+      for (var i=0;i<COMPANIES.length;i++){ COMPANY_BY_ID[COMPANIES[i].id]=COMPANIES[i]; }
 
       const TOWER_ASSIGNMENTS = {
         'MGEKS': ['TEL','AMCC','TELEQUIPE'],
@@ -1245,6 +1248,27 @@
         const extra = LIC_ALVARA[t.id];
         return { ...t, licenciamento: extra ? extra.lic : 'NÃO INFORMADO', alvara: extra ? extra.alv : 'NÃO INFORMADO' };
       });
+      // ===== TORRES VIVO (MAPA APENAS) — padrão DESATIVADO no filtro =====
+      const VIVO_TORRES = [
+        { id:'MG_BCI', nome:'TORRE VIVO (MG_BCI)', tipo:'Implantação em Torre Existente', lat:-20.159083, lng:-44.228250, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_BEC', nome:'TORRE VIVO (MG_BEC)', tipo:'Implantação em Torre Existente', lat:-20.201369, lng:-44.003039, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_BIH', nome:'TORRE VIVO (MG_BIH)', tipo:'Implantação em Torre Existente', lat:-20.108078, lng:-44.221567, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_BIX', nome:'TORRE VIVO (MG_BIX)', tipo:'Implantação em Torre Existente', lat:-20.137389, lng:-44.210531, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_BMO', nome:'TORRE VIVO (MG_BMO)', tipo:'Implantação em Torre Existente', lat:-20.147442, lng:-44.207139, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_BNA', nome:'TORRE VIVO (MG_BNA)', tipo:'Implantação em Torre Existente', lat:-20.196750, lng:-44.108917, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_BSM', nome:'TORRE VIVO (MG_BSM)', tipo:'Implantação em Torre Existente', lat:-20.194281, lng:-43.979150, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_CFJ', nome:'TORRE VIVO (MG_CFJ)', tipo:'Implantação em Torre Existente', lat:-20.106881, lng:-44.113961, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_CSB', nome:'TORRE VIVO (MG_CSB)', tipo:'Implantação em Torre Existente', lat:-20.130700, lng:-44.018069, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_JCA', nome:'TORRE VIVO (MG_JCA)', tipo:'Implantação em Torre Existente', lat:-20.062028, lng:-43.983869, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_NMB', nome:'TORRE VIVO (MG_NMB)', tipo:'Implantação em Torre Existente', lat:-20.060492, lng:-43.974350, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_NSK', nome:'TORRE VIVO (MG_NSK)', tipo:'Implantação em Torre Existente', lat:-20.093942, lng:-43.983306, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_OCO', nome:'TORRE VIVO (MG_OCO)', tipo:'Implantação em Torre Existente', lat:-20.302583, lng:-44.024472, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_SJZ', nome:'TORRE VIVO (MG_SJZ)', tipo:'Implantação em Torre Existente', lat:-20.272722, lng:-44.114806, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_DOZ', nome:'TORRE VIVO (MG_DOZ)', tipo:'Implantação em Torre Existente', lat:-20.157050, lng:-44.194650, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_RTA', nome:'TORRE VIVO (MG_RTA)', tipo:'Implantação em Torre Existente', lat:-20.086961, lng:-43.992931, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true },
+        { id:'MG_VMP', nome:'TORRE VIVO (MG_VMP)', tipo:'Implantação em Torre Existente', lat:-20.151800, lng:-43.984600, status:'Torre Ativa em funcionamento', licenciamento:'LICENÇA EMITIDA', alvara:'ALVARÁ EXPEDIDO', vivo:true }
+      ];
+
 
       /* =============================
          CRONOGRAMA / DATAS (tabela do Guilherme)
@@ -1282,7 +1306,7 @@
 
       const CRONOGRAMA_BY_ID = {};
       CRONOGRAMA_TABELA_RAW.forEach(r => {
-        const k = ID_MAP[r.id] || r.id.replaceAll("_","");
+        const k = ID_MAP[r.id] || r.id.split("_").join("");
         CRONOGRAMA_BY_ID[k] = {
           inicioObra: r.inicioObra,
           terminoAtivacao: r.terminoAtiv
@@ -1314,7 +1338,7 @@
       /* =============================
          HELPERS UI
       ============================== */
-      const two = n => String(n).padStart(2,'0');
+      function two(n){ n = (n==null)?0:n; var s = String(n); return (s.length>=2)?s:('0'+s).slice(-2); }
 
       function chipStatus(t){
         const meta = STATUS_META[t.status] || { chip:'b-gray', label:t.status };
@@ -1575,7 +1599,7 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
             <div class="tower-left">
               <div class="tower-id">${t.id}</div>
               <div class="tower-name">${t.nome}</div>
-              <div class="tower-meta">${chipLic(t.licenciamento)} ${chipAlv(t.alvara)}</div>
+              <div class="tower-meta">${(t.vivo ? '<span class=\"badge b-blue\">Vivo</span>' : '')} ${chipLic(t.licenciamento)} ${chipAlv(t.alvara)}</div>
               <div class="tower-meta">
                 <span class="badge b-gray">🛠️ Início: ${cr.inicioObra || "—"}</span>
                 <span class="badge b-gray">📡 Término: ${cr.terminoAtivacao || "—"}</span>
@@ -1719,13 +1743,14 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
         markers = [];
         bounds = [];
 
-        TORRES.forEach(t => {
+        const ALL_MAP_TOWERS = TORRES.concat(typeof VIVO_TORRES !== "undefined" ? VIVO_TORRES : []);
+      ALL_MAP_TOWERS.forEach(t => {
           const meta = STATUS_META[t.status] || { dot:'status-blue' };
           const pending = isPendencia(t);
           const active = (t.status === 'Torre Ativa em funcionamento');
 
           const dotCls = pending ? 'status-purple' : meta.dot;
-          const blink = (t.status === 'Implantação em Andamento' || t.status === 'Torre em Ativação');
+          const blink = (t.vivo && active) || (t.status === 'Implantação em Andamento' || t.status === 'Torre em Ativação');
 
           const icon = createTowerIcon(dotCls, blink, { active, pending });
           const marker = L.marker([t.lat, t.lng], { icon });
@@ -1833,6 +1858,7 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
         const qkAndamento = document.getElementById('qk-andamento');
         const qkAguardando = document.getElementById('qk-aguardando');
         const qkPendentes = document.getElementById('qk-pendentes');
+      const qkVivo = document.getElementById('qk-vivo');
         const btnReset = document.getElementById('btn-reset');
 
         const stAtivas = document.querySelector('#status-group input[value="Torre Ativa em funcionamento"]');
@@ -1851,10 +1877,11 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
           qkAndamento.checked = true;
           qkAguardando.checked = true;
           qkPendentes.checked = false;
+      if (qkVivo) qkVivo.checked = false;
           applySync();
         }
 
-        [qkAtivas,qkAndamento,qkAguardando,qkPendentes].forEach(el => el && el.addEventListener('change', applySync));
+        [qkAtivas,qkAndamento,qkAguardando,qkPendentes,qkVivo].forEach(el => el && el.addEventListener('change', applySync));
         if (btnReset) btnReset.addEventListener('click', resetFilters);
 
         resetFilters();
@@ -1866,26 +1893,32 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
         const lic = Array.from(document.querySelectorAll('#lic-group input:checked')).map(i=>i.value);
         const alv = Array.from(document.querySelectorAll('#alvara-group input:checked')).map(i=>i.value);
 
-        const pendFilterActive = !!document.getElementById('qk-pendentes')?.checked;
+        const __pendEl = document.getElementById('qk-pendentes');
+      const pendFilterActive = !!(__pendEl && __pendEl.checked);
+      const __vivoEl = document.getElementById('qk-vivo');
+      const vivoActive = !!(__vivoEl && __vivoEl.checked);
 
-        const visible = [];
+        const visibleMarkers = [];
+      const visibleTorres = [];
         markers.forEach(m => {
           let show;
           if (pendFilterActive) show = ops.includes(m.status) && (m.alvara==='PENDENTE' || m.licenciamento==='PENDENTE');
           else show = tipos.includes(m.tipo) && ops.includes(m.status) && lic.includes(m.licenciamento) && alv.includes(m.alvara);
+      // Torres Vivo: aparecem SOMENTE quando o filtro estiver marcado
+      if (!vivoActive && m.vivo) show = false;
 
           if (map){
             if (show && !map.hasLayer(m.marker)) m.marker.addTo(map);
             else if (!show && map.hasLayer(m.marker)) map.removeLayer(m.marker);
           }
 
-          if (show) visible.push(m);
+          if (show) { visibleMarkers.push(m); if (!m.vivo) visibleTorres.push(m); }
         });
 
-        currentVisible = visible;
-        renderResumo(visible);
-        renderTowerCards(visible);
-        renderTorresDashboard(visible);
+        currentVisible = visibleTorres;
+        renderResumo(visibleTorres);
+        renderTowerCards(visibleTorres);
+        renderTorresDashboard(visibleTorres);
       }
 
       /* =============================
@@ -1900,9 +1933,17 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
         localStorage.setItem(LS_KEY, JSON.stringify(arr));
       }
       function escapeHTML(s){
-        return String(s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-      }
-      function typeBadge(tipo){
+      return String(s||"").replace(/[&<>"']/g, function(c){
+        if (c === '&') return '&amp;';
+        if (c === '<') return '&lt;';
+        if (c === '>') return '&gt;';
+        if (c === '"') return '&quot;';
+        if (c === "'") return '&#39;';
+        return c;
+      });
+    }
+
+    function typeBadge(tipo){
         const map = {
           "Geral":"b-gray",
           "Risco":"b-amber",
@@ -1955,7 +1996,7 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
 
         const inputData = document.getElementById("obs-data");
         const d = new Date();
-        inputData.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        inputData.value = `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
 
         document.getElementById("btn-obs-limpar").addEventListener("click", () => {
           document.getElementById("obs-texto").value = "";
