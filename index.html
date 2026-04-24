@@ -395,6 +395,22 @@
     }
     .leaflet-popup-tip{ background:#fff; border:1px solid var(--line); }
 
+/* ========= TOOLTIP (HOVER) — MOSTRA SOMENTE O ID ========= */
+    .leaflet-tooltip.tower-tooltip{
+      background:#ffffff;
+      border:1px solid var(--line);
+      color:#006666;
+      font-weight:1000;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      box-shadow:0 10px 24px rgba(2,6,23,.10);
+    }
+    .leaflet-tooltip.tower-tooltip:before{
+      border-top-color:#ffffff;
+    }
+
+
     /* ========= ÍCONE TORRE ========= */
     .leaflet-div-icon{ background:transparent; border:none; }
     @keyframes blink{0%,50%{opacity:1;}75%{opacity:.4;}100%{opacity:1;}}
@@ -888,6 +904,15 @@
             <label><input type="checkbox" id="qk-vivo"> Torres Vivo</label>
 <button type="button" id="btn-reset" class="btn-reset">Limpar filtros</button>
           </div>
+<!-- ====== NOVO: seletor de torre (à direita) ====== -->
+          <div class="group" style="margin-left:auto" aria-label="Selecionar torre no mapa">
+            <strong>TORRES</strong>
+            <select id="tower-select" aria-label="Selecionar torre" style="width:190px; max-width:190px;">
+              <option value="">Selecionar torre…</option>
+            </select>
+          </div>
+
+
 
           <!-- grupos ocultos (mantidos para lógica interna) -->
           <div class="group hidden" id="tipo-group">
@@ -1193,13 +1218,13 @@
         MGCIK:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
         MGARX:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
         MGAKL:{lic:'LICENÇA EMITIDA',alv:'ALVARÁ EXPEDIDO'},
-        MGKRM:{lic:'PENDENTE', alv:'ALVARÁ EXPEDIDO'},
+        MGKRM:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
         MGJSK:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
         MGEXQ:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
         MGTKC:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
         MGKRV:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
         MGMFK:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
-        MGBJU:{lic:'PENDENTE', alv:'PENDENTE'},
+        MGBJU:{lic:'LICENÇA EMITIDA', alv:'PENDENTE'},
         MGIPA:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
         MGKRA:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'},
         MGPKL:{lic:'LICENÇA EMITIDA', alv:'ALVARÁ EXPEDIDO'}
@@ -1230,12 +1255,12 @@
         { id:'MGARX', nome:'BRUMADINHO PONTE DAS ALMORREIMAS', tipo:'Implantação de nova Torre', lat:-20.198044, lng:-44.174273, status:'Torre Aguardando Inicio da Implantação' },
         { id:'MGBJU', nome:'BRUMADINHO TEJUCO', tipo:'Implantação de nova Torre', lat:-20.124972, lng:-44.163199, status:'Torre Aguardando Inicio da Implantação' },
         { id:'MGCIK', nome:'BRUMADINHO CONCEIÇÃO DE ITAGUÁ', tipo:'Implantação de nova Torre', lat:-20.195297, lng:-44.238975, status:'Implantação em Andamento' },
-        { id:'MGCRF', nome:'BRUMADINHO CÓRREGO DE ALMAS', tipo:'Implantação de nova Torre', lat:-20.213412, lng:-44.056493, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGCRF', nome:'BRUMADINHO CÓRREGO DE ALMAS', tipo:'Implantação de nova Torre', lat:-20.213412, lng:-44.056493, status:'Implantação em Andamento' },
         { id:'MGEKS', nome:'BRUMADINHO ARANHA ENCOSTA DA SERRA', tipo:'Implantação de nova Torre', lat:-20.245801, lng:-44.005216, status:'Implantação em Andamento' },
         { id:'MGEXQ', nome:'BRUMADINHO LOCALIDADE EIXO QUEBRADO', tipo:'Implantação de nova Torre', lat:-20.224244, lng:-44.202524, status:'Torre Aguardando Inicio da Implantação' },
         { id:'MGJSK', nome:'BRUMADINHO SÃO JOSÉ DO PARAOPEBA', tipo:'Implantação de nova Torre', lat:-20.30699, lng:-44.076897, status:'Torre Aguardando Inicio da Implantação' },
         { id:'MGKRA', nome:'BRUMADINHO CASA BRANCA RECANTO DA ALDEIA', tipo:'Implantação em Torre Existente', lat:-20.085327, lng:-44.04063, status:'Torre Ativa em funcionamento' },
-        { id:'MGKRF', nome:'BRUMADINHO LOCALIDADE CÓRREGO DO FEIJÃO', tipo:'Implantação de nova Torre', lat:-20.135867, lng:-44.108318, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGKRF', nome:'BRUMADINHO LOCALIDADE CÓRREGO DO FEIJÃO', tipo:'Implantação de nova Torre', lat:-20.135867, lng:-44.108318, status:'Implantação em Andamento' },
         { id:'MGKRM', nome:'BRUMADINHO QUINTAS DO RIO MANSO', tipo:'Implantação de nova Torre', lat:-20.170518, lng:-44.246529, status:'Torre Aguardando Inicio da Implantação' },
         { id:'MGKRV', nome:'BRUMADINHO CASA BRANCA RECANTO DO VALE', tipo:'Implantação de nova Torre', lat:-20.094703, lng:-44.049343, status:'Torre Aguardando Inicio da Implantação' },
         { id:'MGMFK', nome:'BRUMADINHO MELO FRANCO', tipo:'Implantação de nova Torre', lat:-20.176064, lng:-44.133761, status:'Torre Aguardando Inicio da Implantação' },
@@ -1755,6 +1780,22 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
           const icon = createTowerIcon(dotCls, blink, { active, pending });
           const marker = L.marker([t.lat, t.lng], { icon });
 
+// (mouse) mostra somente o ID, sem clique =====
+          marker.bindTooltip(`${t.id}`, {
+            permanent: false,
+            direction: 'top',
+            offset: [0, -28],
+            opacity: 0.98,
+            className: 'tower-tooltip'
+          });
+
+          marker.on('mouseover', () => {
+            try{ marker.openTooltip(); }catch(e){}
+          });
+          marker.on('mouseout', () => {
+            try{ marker.closeTooltip(); }catch(e){}
+          });
+
           const cr = getCronoFor(t.id);
 
           marker.bindPopup(`
@@ -1788,6 +1829,8 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
               </div>
             </div>
           `);
+
+
 
           marker.on('popupopen', (e)=>{
             const btn = e.popup.getElement().querySelector(`[data-open-tower="${t.id}"]`);
@@ -2032,6 +2075,46 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
         renderObs();
       }
 
+/* =============================
+    /* =============================
+         NOVO: FILTRO (SELECT) PARA CENTRALIZAR NA TORRE
+      ============================== */
+      function initTowerSelect(){
+        const sel = document.getElementById('tower-select');
+        if (!sel) return;
+
+        // Junta IDs: TORRES do projeto + TORRES VIVO (se existir)
+        const ids = []
+          .concat((typeof TORRES !== "undefined" ? TORRES : []).map(t => t.id))
+          .concat((typeof VIVO_TORRES !== "undefined" ? VIVO_TORRES : []).map(t => t.id));
+
+        // Remove duplicados e ordena
+        const uniqueIds = Array.from(new Set(ids)).sort((a,b) => a.localeCompare(b));
+
+        // Preenche somente com ID (sem localidade) para não ficar largo
+        sel.innerHTML =
+          `<option value="">Selecionar torre…</option>` +
+          uniqueIds.map(id => `<option value="${id}">${id}</option>`).join('');
+
+        sel.addEventListener('change', () => {
+          const id = sel.value;
+          if (!id) return;
+
+          // markers contém TODOS os marcadores do mapa (TORRES + VIVO)
+          const m = markers.find(x => x.id === id);
+          if (m && map){
+            // garante que o marcador esteja no mapa (caso esteja oculto por filtro)
+            if (!map.hasLayer(m.marker)) m.marker.addTo(map);
+
+            map.setView([m.lat, m.lng], 16, { animate:true });
+            setTimeout(() => {
+              try{ m.marker.openPopup(); }catch(e){}
+            }, 250);
+          }
+        });
+      }
+``
+
       /* =============================
          INIT
       ============================== */
@@ -2044,8 +2127,8 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
       renderResumo(TORRES);
       initObs();
 
-      initMap();
-      wireQuickFilters();
+      initMap(); wireQuickFilters();
+      initTowerSelect();
 
       const initial = getRoute();
       showPage(initial);
