@@ -1,0 +1,18 @@
+[project]
+name = "mirofish-cc"
+version = "0.1.0"
+description = "MiroFish-CC multi-agent swarm intelligence prediction engine"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "click",
+  "PyPDF2",
+  "pydantic>=2.0",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["mirofish*"]
