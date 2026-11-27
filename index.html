@@ -2343,7 +2343,7 @@ Dir. de Gestão de Territórios Sul e Sudeste e Reparação • Uso Interno</spa
 
       const STATUS_META = {
         'Torre Ativa em funcionamento':{ dot:'status-green', chip:'b-green', label:'Ativa' },
-        'Torre em Ativação':{ dot:'status-blue', chip:'b-blue', label:'Em ativação' },
+        'Torre em Ativação':{ dot:'status-blue', chip:'b-blue', label:'Pronta · aguardando ativação' },
         'Torre Aguardando Inicio da Implantação':{ dot:'status-purple', chip:'b-purple', label:'Aguardando' },
         'Implantação em Andamento': { dot:'status-blue', chip:'b-blue', label:'Em andamento' }
       };
@@ -2392,24 +2392,24 @@ Dir. de Gestão de Territórios Sul e Sudeste e Reparação • Uso Interno</spa
       const TORRES = [
         { id:'MGIPA', nome:'BRUMADINHO - PIEDADE DO PARAOPEBA', tipo:'Modernização em Torre Existente', lat:-20.169611, lng:-44.01875, status:'Torre Ativa em funcionamento' },
         { id:'MGAKL', nome:'BRUMADINHO ÁGUAS CLARAS', tipo:'Implantação de nova Torre', lat:-20.192362, lng:-44.204888, status:'Torre Ativa em funcionamento' },
-        { id:'MGARW', nome:'BRUMADINHO CACHOEIRA DAS ALMORREIMAS', tipo:'Implantação de nova Torre', lat:-20.173309, lng:-44.155957, status:'Torre Aguardando Inicio da Implantação' },
-        { id:'MGARX', nome:'BRUMADINHO PONTE DAS ALMORREIMAS', tipo:'Implantação de nova Torre', lat:-20.198044, lng:-44.174273, status:'Torre Aguardando Inicio da Implantação' },
-        { id:'MGBJU', nome:'BRUMADINHO TEJUCO', tipo:'Implantação de nova Torre', lat:-20.124972, lng:-44.163199, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGARW', nome:'BRUMADINHO CACHOEIRA DAS ALMORREIMAS', tipo:'Implantação de nova Torre', lat:-20.173309, lng:-44.155957, status:'Torre em Ativação' },
+        { id:'MGARX', nome:'BRUMADINHO PONTE DAS ALMORREIMAS', tipo:'Implantação de nova Torre', lat:-20.198044, lng:-44.174273, status:'Torre em Ativação' },
+        { id:'MGBJU', nome:'BRUMADINHO TEJUCO', tipo:'Implantação de nova Torre', lat:-20.124972, lng:-44.163199, status:'Implantação em Andamento' },
         { id:'MGCIK', nome:'BRUMADINHO CONCEIÇÃO DE ITAGUÁ', tipo:'Implantação de nova Torre', lat:-20.195297, lng:-44.238975, status:'Torre Ativa em funcionamento' },
         { id:'MGCRF', nome:'BRUMADINHO CÓRREGO DE ALMAS', tipo:'Implantação de nova Torre', lat:-20.213412, lng:-44.056493, status:'Torre Ativa em funcionamento' },
         { id:'MGEKS', nome:'BRUMADINHO ARANHA ENCOSTA DA SERRA', tipo:'Implantação de nova Torre', lat:-20.245801, lng:-44.005216, status:'Torre Ativa em funcionamento' },
         { id:'MGEXQ', nome:'BRUMADINHO LOCALIDADE EIXO QUEBRADO', tipo:'Implantação de nova Torre', lat:-20.224244, lng:-44.202524, status:'Torre Aguardando Inicio da Implantação' },
         { id:'MGJSK', nome:'BRUMADINHO SÃO JOSÉ DO PARAOPEBA', tipo:'Implantação de nova Torre', lat:-20.30699, lng:-44.076897, status:'Torre Aguardando Inicio da Implantação' },
         { id:'MGKRA', nome:'BRUMADINHO CASA BRANCA RECANTO DA ALDEIA', tipo:'Implantação em Torre Existente', lat:-20.085327, lng:-44.04063, status:'Torre Ativa em funcionamento' },
-        { id:'MGKRF', nome:'BRUMADINHO LOCALIDADE CÓRREGO DO FEIJÃO', tipo:'Implantação de nova Torre', lat:-20.135867, lng:-44.108318, status:'Implantação em Andamento' },
-        { id:'MGKRM', nome:'BRUMADINHO QUINTAS DO RIO MANSO', tipo:'Implantação de nova Torre', lat:-20.170518, lng:-44.246529, status:'Implantação em Andamento' },
-        { id:'MGKRV', nome:'BRUMADINHO CASA BRANCA RECANTO DO VALE', tipo:'Implantação de nova Torre', lat:-20.101528, lng:-44.045306, status:'Implantação em Andamento' },
-        { id:'MGMFK', nome:'BRUMADINHO MELO FRANCO', tipo:'Implantação de nova Torre', lat:-20.176064, lng:-44.133761, status:'Torre Aguardando Inicio da Implantação' },
+        { id:'MGKRF', nome:'BRUMADINHO LOCALIDADE CÓRREGO DO FEIJÃO', tipo:'Implantação de nova Torre', lat:-20.135867, lng:-44.108318, status:'Torre Ativa em funcionamento' },
+        { id:'MGKRM', nome:'BRUMADINHO QUINTAS DO RIO MANSO', tipo:'Implantação de nova Torre', lat:-20.170518, lng:-44.246529, status:'Torre Ativa em funcionamento' },
+        { id:'MGKRV', nome:'BRUMADINHO CASA BRANCA RECANTO DO VALE', tipo:'Implantação de nova Torre', lat:-20.101528, lng:-44.045306, status:'Torre Ativa em funcionamento' },
+        { id:'MGMFK', nome:'BRUMADINHO MELO FRANCO', tipo:'Implantação de nova Torre', lat:-20.176064, lng:-44.133761, status:'Implantação em Andamento' },
         { id:'MGPKL', nome:'BRUMADINHO PARQUE DO LAGO', tipo:'Implantação em Torre Existente', lat:-20.143119, lng:-44.157913, status:'Torre Ativa em funcionamento' },
         { id:'MGPPY', nome:'BRUMADINHO PIEDADE PARAOPEBA MARQUES', tipo:'Implantação de nova Torre', lat:-20.191013, lng:-44.051539, status:'Torre Aguardando Inicio da Implantação' },
-        { id:'MGQLS', nome:'BRUMADINHO QUILOMBO DO SAPE E RODRIGUES', tipo:'Implantação de nova Torre', lat:-20.266763, lng:-44.065006, status:'Implantação em Andamento' },
-        { id:'MGRBD', nome:'BRUMADINHO RETIRO DO BRUMADO', tipo:'Implantação de nova Torre', lat:-20.152368, lng:-44.248397, status:'Implantação em Andamento' },
-        { id:'MGTKC', nome:'BRUMADINHO TOCA DE CIMA', tipo:'Implantação de nova Torre', lat:-20.224508, lng:-44.125745, status:'Torre Aguardando Inicio da Implantação' }
+        { id:'MGQLS', nome:'BRUMADINHO QUILOMBO DO SAPE E RODRIGUES', tipo:'Implantação de nova Torre', lat:-20.266763, lng:-44.065006, status:'Torre Ativa em funcionamento' },
+        { id:'MGRBD', nome:'BRUMADINHO RETIRO DO BRUMADO', tipo:'Implantação de nova Torre', lat:-20.152368, lng:-44.248397, status:'Torre Ativa em funcionamento' },
+        { id:'MGTKC', nome:'BRUMADINHO TOCA DE CIMA', tipo:'Implantação de nova Torre', lat:-20.224508, lng:-44.125745, status:'Torre Ativa em funcionamento' }
       ].map(t => {
         const extra = LIC_ALVARA[t.id];
         return { ...t, licenciamento: extra ? extra.lic : 'NÃO INFORMADO', alvara: extra ? extra.alv : 'NÃO INFORMADO' };
@@ -2820,7 +2820,7 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
 
         const totalAtivadas   = arr.filter(t => t.status === 'Torre Ativa em funcionamento').length;
         const totalAguardando = arr.filter(t => t.status === 'Torre Aguardando Inicio da Implantação').length;
-        const totalAndamento  = arr.filter(t => t.status === 'Implantação em Andamento').length;
+        const totalAndamento  = arr.filter(t => t.status === 'Implantação em Andamento' || t.status === 'Torre em Ativação').length;
         const totalAlvaraPend = arr.filter(t => t.alvara === 'PENDENTE').length;
         const totalLicPend    = arr.filter(t => t.licenciamento === 'PENDENTE').length;
 
@@ -2852,7 +2852,7 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
         const arr = Array.isArray(subset) ? subset : TORRES;
         const totalAtivadas   = arr.filter(t => t.status === 'Torre Ativa em funcionamento').length;
         const totalAguardando = arr.filter(t => t.status === 'Torre Aguardando Inicio da Implantação').length;
-        const totalAndamento  = arr.filter(t => t.status === 'Implantação em Andamento').length;
+        const totalAndamento  = arr.filter(t => t.status === 'Implantação em Andamento' || t.status === 'Torre em Ativação').length;
         const totalAlvaraPend = arr.filter(t => t.alvara === 'PENDENTE').length;
         const totalLicPend    = arr.filter(t => t.licenciamento === 'PENDENTE').length;
 
@@ -3188,7 +3188,6 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
       ============================== */
       function wireQuickFilters(){
         const stAtivacao = document.querySelector('#status-group input[value="Torre em Ativação"]');
-        if (stAtivacao) stAtivacao.checked = false;
 
         const qkAtivas = document.getElementById('qk-ativas');
         const qkAndamento = document.getElementById('qk-andamento');
@@ -3205,6 +3204,7 @@ document.querySelectorAll("[data-home]").forEach(btn => btn.addEventListener("cl
         function applySync(){
           if (stAtivas) stAtivas.checked = qkAtivas.checked;
           if (stAndamento) stAndamento.checked = qkAndamento.checked;
+          if (stAtivacao) stAtivacao.checked = qkAndamento.checked;
           if (stAguardando) stAguardando.checked = qkAguardando.checked;
           applyFilters();
         }
